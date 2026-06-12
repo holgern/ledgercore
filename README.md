@@ -67,6 +67,47 @@ parse_prefixed_number(value, *, prefix, separator="-", width=4)
 slugify_ref(value, *, empty="item")
 ```
 
+### Cross-ledger resource references (`ledgercore.refs`)
+
+Use local IDs inside one ledger and global refs when linking records across ledgers.
+
+```python
+from ledgercore.refs import parse_resource_ref
+
+ref = parse_resource_ref("tl:task-0001")
+assert ref.local_id == "task-0001"
+assert ref.global_ref == "tl:task-0001"
+assert ref.file_ref == "tl-task-0001"
+```
+
+Canonical global refs use:
+
+```text
+<ledger>:<kind>-<number>
+```
+
+Examples:
+
+```text
+tl:task-0001
+al:adr-0002
+sw:spec-0003
+```
+
+File-safe aliases use `-` instead of `:`:
+
+```text
+tl-task-0001
+al-adr-0002
+```
+
+Local IDs remain unchanged:
+
+```text
+task-0001
+adr-0002
+```
+
 ### Text I/O (`ledgercore.io`)
 
 ```python

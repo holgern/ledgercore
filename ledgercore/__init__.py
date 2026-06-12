@@ -25,6 +25,16 @@ from ledgercore.ids import (
     parse_prefixed_number,
     slugify_ref,
 )
+from ledgercore.refs import (
+    LedgerResourceRef,
+    RefStyle,
+    is_resource_ref,
+    normalize_kind,
+    normalize_ref_token,
+    parse_global_ref,
+    parse_local_ref,
+    parse_resource_ref,
+)
 from ledgercore.io import (
     content_hash,
     ensure_dir,
@@ -68,6 +78,14 @@ __all__ = [
     "next_prefixed_id",
     "parse_prefixed_number",
     "slugify_ref",
+    "LedgerResourceRef",
+    "RefStyle",
+    "is_resource_ref",
+    "normalize_kind",
+    "normalize_ref_token",
+    "parse_global_ref",
+    "parse_local_ref",
+    "parse_resource_ref",
     "content_hash",
     "ensure_dir",
     "merge_text",
