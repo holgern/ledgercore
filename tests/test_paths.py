@@ -75,6 +75,7 @@ class TestValidateRelativePosixPath:
         with pytest.raises(PathValidationError, match="'.'"):
             validate_relative_posix_path("a/.")
 
+
 class TestResolveRelativeChild:
     def test_resolves(self, tmp_path: Path) -> None:
         result = resolve_relative_child(tmp_path, "a/b.txt")

@@ -9,9 +9,31 @@ description = "Generic ledger and storage primitives for Python projects"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+  { name = "holgern" },
+]
+keywords = ["ledger", "storage", "frontmatter", "ids", "yaml", "json"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
 dependencies = [
     "PyYAML",
 ]
+
+[project.urls]
+Homepage = "https://github.com/holgern/ledgercore"
+Repository = "https://github.com/holgern/ledgercore"
+Issues = "https://github.com/holgern/ledgercore/issues"
+Changelog = "https://github.com/holgern/ledgercore/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -19,6 +41,10 @@ dev = [
     "ruff",
     "mypy",
     "types-PyYAML",
+]
+release = [
+    "build",
+    "twine",
 ]
 
 [tool.ruff]

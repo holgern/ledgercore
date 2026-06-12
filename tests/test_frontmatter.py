@@ -147,7 +147,6 @@ class TestIterSourceFiles:
         result = iter_source_files(tmp_path / "nope", (".md",))
         assert result == []
 
-
     def test_finds_md_files(self, tmp_path: Path) -> None:
         (tmp_path / "a.md").write_text("a")
         (tmp_path / "b.txt").write_text("b")

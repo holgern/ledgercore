@@ -11,6 +11,7 @@ class LedgerCoreError(Exception):
         if code is not None:
             self.code = code
 
+
 class StorageError(LedgerCoreError):
     """Base exception for storage-related errors."""
 
@@ -27,9 +28,9 @@ class JsonStoreError(StorageError):
     """Raised when a JSON store operation fails."""
 
 
-
 class YamlStoreError(StorageError):
     """Raised when a YAML store operation fails."""
+
 
 class PathValidationError(StorageError):
     """Raised when a path fails validation."""

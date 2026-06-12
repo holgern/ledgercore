@@ -1,4 +1,5 @@
 """Tests for ledgercore.refs."""
+
 from __future__ import annotations
 
 import pytest

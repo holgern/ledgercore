@@ -27,9 +27,7 @@ def validate_relative_posix_path(
     if not value:
         raise PathValidationError(f"{field_name} must not be empty")
     if "\\" in value:
-        raise PathValidationError(
-            f"{field_name} must not contain backslashes: {value}"
-        )
+        raise PathValidationError(f"{field_name} must not contain backslashes: {value}")
     if value.startswith("/"):
         raise PathValidationError(
             f"{field_name} must be relative, not absolute: {value}"

@@ -98,7 +98,7 @@ class TestWriteJson:
         data = json.loads(text)
         assert data == {"a": 1, "b": 2}
         lines = text.split("\n")
-        assert lines[1].startswith("  \"a\"")
+        assert lines[1].startswith('  "a"')
 
     def test_indent_and_sort(self, tmp_path: Path) -> None:
         p = tmp_path / "f.json"

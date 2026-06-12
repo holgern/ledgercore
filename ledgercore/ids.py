@@ -39,9 +39,7 @@ class LedgerIdFormat:
         padded = f"{number:0{self.width}d}"
         if segment is not None:
             seg_sep = (
-                self.segment_separator
-                if self.segment_separator
-                else self.separator
+                self.segment_separator if self.segment_separator else self.separator
             )
             return f"{self.prefix}{seg_sep}{segment}{self.separator}{padded}"
         return f"{self.prefix}{self.separator}{padded}"
@@ -117,9 +115,7 @@ class LedgerIdFormat:
 
     def _build_simple_pattern(self) -> re.Pattern[str]:
         sep = re.escape(self.separator)
-        return re.compile(
-            rf"^{re.escape(self.prefix)}{sep}(?P<number>\d+)$"
-        )
+        return re.compile(rf"^{re.escape(self.prefix)}{sep}(?P<number>\d+)$")
 
     def _build_segmented_pattern(self) -> re.Pattern[str]:
         assert self.segment_separator is not None

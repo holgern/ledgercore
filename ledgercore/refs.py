@@ -1,4 +1,5 @@
 """Cross-ledger resource reference parsing and formatting."""
+
 from __future__ import annotations
 
 import re
@@ -57,25 +58,40 @@ class LedgerResourceRef:
 
     @property
     def local_id(self) -> str:
+        """The local ID without ledger namespace, e.g. ``task-0001``."""
         return f"{self.kind}-{self.number:0{self.width}d}"
 
     @property
     def is_global(self) -> bool:
+        """True when a ledger namespace is attached."""
         return self.ledger is not None
 
     @property
     def global_ref(self) -> str:
+        """Canonical global ref, e.g. ``tl:task-0001``.
+
+        Raises IdFormatError when ledger is None.
+        """
         if self.ledger is None:
             raise IdFormatError("Cannot format a global ref without a ledger code")
         return f"{self.ledger}:{self.local_id}"
 
     @property
     def file_ref(self) -> str:
+        """File-safe global ref using ``-`` instead of ``:``, e.g. ``tl-task-0001``.
+
+        Raises IdFormatError when ledger is None.
+        """
         if self.ledger is None:
             raise IdFormatError("Cannot format a file ref without a ledger code")
         return f"{self.ledger}-{self.local_id}"
 
     def format(self, style: RefStyle = "canonical") -> str:
+        """Format the ref in the requested style.
+
+        Styles: ``canonical`` (``tl:task-0001``), ``file`` (``tl-task-0001``),
+        ``local`` (``task-0001``).
+        """
         if style == "canonical":
             return self.global_ref
         if style == "file":
@@ -85,6 +101,7 @@ class LedgerResourceRef:
         raise IdFormatError(f"Unsupported ref style: {style}")
 
     def with_ledger(self, ledger: str) -> LedgerResourceRef:
+        """Return a copy of this ref with the given ledger namespace."""
         return LedgerResourceRef(
             ledger=ledger,
             kind=self.kind,
@@ -94,6 +111,11 @@ class LedgerResourceRef:
 
 
 def normalize_ref_token(value: str, *, label: str) -> str:
+    """Lowercase and validate a short token such as a ledger code.
+
+    The token must start with a letter and contain only lowercase
+    alphanumeric characters. Raises IdFormatError on invalid input.
+    """
     normalized = value.strip().lower()
     if not _TOKEN_RE.fullmatch(normalized):
         raise IdFormatError(f"Invalid {label}: {value!r}")
@@ -101,6 +123,11 @@ def normalize_ref_token(value: str, *, label: str) -> str:
 
 
 def normalize_kind(value: str) -> str:
+    """Lowercase, replace underscores with hyphens, and validate a resource kind.
+
+    The kind must start with a letter and may contain hyphens.
+    Raises IdFormatError on invalid input.
+    """
     normalized = value.strip().lower().replace("_", "-")
     if not _KIND_RE.fullmatch(normalized):
         raise IdFormatError(f"Invalid resource kind: {value!r}")
