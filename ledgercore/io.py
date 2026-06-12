@@ -30,7 +30,7 @@ def write_text(path: Path, text: str, *, normalize: bool = True) -> None:
     if normalize:
         text = normalize_newlines(text)
     ensure_dir(path.parent)
-    path.write_text(text, encoding="utf-8")
+    path.write_bytes(text.encode("utf-8"))
 
 
 def content_hash(text: str) -> str:
