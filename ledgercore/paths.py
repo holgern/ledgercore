@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 from ledgercore.errors import PathValidationError
@@ -20,6 +21,7 @@ def validate_relative_posix_path(
     value: str,
     *,
     field_name: str = "path",
+    allow_trailing_slash: bool = False,
 ) -> str:
     """Validate that a path is a safe relative POSIX path."""
     if not value:
@@ -32,9 +34,21 @@ def validate_relative_posix_path(
         raise PathValidationError(
             f"{field_name} must be relative, not absolute: {value}"
         )
+    if not allow_trailing_slash and value.endswith("/"):
+        raise PathValidationError(
+            f"{field_name} must not end with a trailing slash: {value}"
+        )
 
     segments = value.split("/")
+    # When trailing slash is allowed, the split may produce a trailing empty
+    # segment; skip it.
+    if allow_trailing_slash and segments and not segments[-1]:
+        segments = segments[:-1]
     for seg in segments:
+        if not seg:
+            raise PathValidationError(
+                f"{field_name} must not contain empty segments: {value}"
+            )
         if seg in (".", ".."):
             raise PathValidationError(
                 f"{field_name} must not contain '.' or '..' segments: {value}"
@@ -77,3 +91,79 @@ def find_config_upwards(
         if parent == current:
             return None
         current = parent
+
+
+@dataclass(frozen=True)
+class ConfigLocator:
+    """Result of a config file search."""
+
+    workspace_root: Path
+    config_path: Path
+    source: str
+
+
+def locate_config(
+    start: Path,
+    filenames: tuple[str, ...],
+    *,
+    default_filename: str | None = None,
+) -> ConfigLocator | None:
+    """Find a config file and return both its path and the workspace root.
+
+    Args:
+        start: Directory or file to start searching from.
+        filenames: Ordered candidate filenames to search for.
+        default_filename: If provided and no config is found, create a
+            locator pointing at start/default_filename without checking
+            existence.
+
+    Returns:
+        ConfigLocator with workspace_root and config_path, or None.
+    """
+    search_start = start.resolve()
+    if search_start.is_file():
+        search_start = search_start.parent
+
+    config_path = find_config_upwards(search_start, filenames)
+    if config_path is not None:
+        return ConfigLocator(
+            workspace_root=config_path.parent,
+            config_path=config_path,
+            source="found",
+        )
+
+    if default_filename is not None:
+        default_path = (search_start / default_filename).resolve()
+        return ConfigLocator(
+            workspace_root=search_start,
+            config_path=default_path,
+            source="default",
+        )
+
+    return None
+
+
+def resolve_config_relative_path(
+    config_path: Path,
+    value: str,
+    *,
+    field_name: str,
+) -> Path:
+    """Resolve a relative path relative to the config file's directory.
+
+    Absolute values are rejected by default.
+    """
+    if value.startswith("/"):
+        raise PathValidationError(
+            f"{field_name} must be relative to config, not absolute: {value}"
+        )
+    validate_relative_posix_path(value, field_name=field_name)
+    config_dir = config_path.parent.resolve()
+    resolved = (config_dir / value).resolve()
+    try:
+        resolved.relative_to(config_dir)
+    except ValueError:
+        raise PathValidationError(
+            f"{field_name} escapes config directory: {value}"
+        ) from None
+    return resolved

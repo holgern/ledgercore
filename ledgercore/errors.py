@@ -4,6 +4,12 @@
 class LedgerCoreError(Exception):
     """Base exception for all ledgercore errors."""
 
+    code: str = "LEDGERCORE_ERROR"
+
+    def __init__(self, message: str, *, code: str | None = None) -> None:
+        super().__init__(message)
+        if code is not None:
+            self.code = code
 
 class StorageError(LedgerCoreError):
     """Base exception for storage-related errors."""
@@ -20,6 +26,10 @@ class FrontMatterError(StorageError):
 class JsonStoreError(StorageError):
     """Raised when a JSON store operation fails."""
 
+
+
+class YamlStoreError(StorageError):
+    """Raised when a YAML store operation fails."""
 
 class PathValidationError(StorageError):
     """Raised when a path fails validation."""

@@ -41,6 +41,23 @@ class TestLoadJsonObject:
         with pytest.raises(JsonStoreError, match="my-config"):
             load_json_object(p, label="my-config")
 
+    def test_missing_empty_returns_empty(self, tmp_path: Path) -> None:
+        p = tmp_path / "missing.json"
+        result = load_json_object(p, missing="empty")
+        assert result == {}
+
+    def test_empty_file_error(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.json"
+        p.write_text("", encoding="utf-8")
+        with pytest.raises(JsonStoreError, match="empty"):
+            load_json_object(p, empty="error")
+
+    def test_empty_file_empty_returns_empty(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.json"
+        p.write_text("", encoding="utf-8")
+        result = load_json_object(p, empty="empty")
+        assert result == {}
+
 
 class TestLoadJsonArray:
     def test_loads_array(self, tmp_path: Path) -> None:
@@ -54,6 +71,23 @@ class TestLoadJsonArray:
         p.write_text('{"a": 1}', encoding="utf-8")
         with pytest.raises(JsonStoreError, match="JSON array"):
             load_json_array(p)
+
+    def test_missing_empty_returns_empty(self, tmp_path: Path) -> None:
+        p = tmp_path / "missing.json"
+        result = load_json_array(p, missing="empty")
+        assert result == []
+
+    def test_empty_file_empty_returns_empty(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.json"
+        p.write_text("", encoding="utf-8")
+        result = load_json_array(p, empty="empty")
+        assert result == []
+
+    def test_empty_file_error(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.json"
+        p.write_text("", encoding="utf-8")
+        with pytest.raises(JsonStoreError, match="empty"):
+            load_json_array(p, empty="error")
 
 
 class TestWriteJson:

@@ -11,7 +11,9 @@ from ledgercore.frontmatter import (
     iter_markdown_files,
     iter_source_files,
     read_front_matter_document,
+    read_markdown_front_matter,
     write_front_matter_document,
+    write_markdown_front_matter,
 )
 
 
@@ -146,10 +148,43 @@ class TestIterSourceFiles:
         assert result == []
 
 
-class TestIterMarkdownFiles:
     def test_finds_md_files(self, tmp_path: Path) -> None:
         (tmp_path / "a.md").write_text("a")
         (tmp_path / "b.txt").write_text("b")
         result = iter_markdown_files(tmp_path)
         assert len(result) == 1
         assert result[0].name == "a.md"
+
+
+class TestAdocFrontMatter:
+    def test_adoc_round_trip(self, tmp_path: Path) -> None:
+        p = tmp_path / "doc.adoc"
+        meta = {"title": "Architecture", "status": "draft"}
+        body = "== Section 1\n\nSome content.\n"
+        write_front_matter_document(p, meta, body)
+        meta2, body2 = read_front_matter_document(p)
+        assert meta2 == meta
+        assert body2 == body
+
+    def test_adoc_empty_front_matter(self, tmp_path: Path) -> None:
+        p = tmp_path / "doc.adoc"
+        _write_doc(p, "---\n---\nAsciiDoc body.\n")
+        meta, body = read_front_matter_document(p)
+        assert meta == {}
+        assert body == "AsciiDoc body.\n"
+
+
+class TestCompatibilityAliases:
+    def test_read_markdown_front_matter(self, tmp_path: Path) -> None:
+        p = tmp_path / "doc.md"
+        _write_doc(p, "---\ntitle: Alias\n---\nBody.\n")
+        meta, body = read_markdown_front_matter(p)
+        assert meta == {"title": "Alias"}
+        assert body == "Body.\n"
+
+    def test_write_markdown_front_matter(self, tmp_path: Path) -> None:
+        p = tmp_path / "doc.md"
+        write_markdown_front_matter(p, {"key": 1}, "body\n")
+        meta, body = read_front_matter_document(p)
+        assert meta == {"key": 1}
+        assert body == "body\n"

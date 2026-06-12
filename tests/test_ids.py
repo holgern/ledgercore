@@ -5,11 +5,127 @@ from __future__ import annotations
 import pytest
 
 from ledgercore.ids import (
+    LedgerIdFormat,
     NumericIdFormat,
     next_prefixed_id,
     parse_prefixed_number,
     slugify_ref,
 )
+
+
+class TestLedgerIdFormat:
+    def test_task_format(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert fmt.format(1) == "task-0001"
+
+    def test_plan_format(self) -> None:
+        fmt = LedgerIdFormat(prefix="plan")
+        assert fmt.format(1) == "plan-0001"
+
+    def test_al_underscore(self) -> None:
+        fmt = LedgerIdFormat(prefix="al", separator="_")
+        assert fmt.format(13) == "al_0013"
+
+    def test_al_segmented(self) -> None:
+        fmt = LedgerIdFormat(
+            prefix="al",
+            separator="_",
+            segment_separator="_",
+        )
+        assert fmt.format(13, segment="content") == "al_content_0013"
+
+    def test_parse(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert fmt.parse("task-0001") == 1
+
+    def test_parse_underscore(self) -> None:
+        fmt = LedgerIdFormat(prefix="al", separator="_")
+        assert fmt.parse("al_0042") == 42
+
+    def test_parse_parts_simple(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        parts = fmt.parse_parts("task-0003")
+        assert parts.prefix == "task"
+        assert parts.number == 3
+        assert parts.segment is None
+
+    def test_parse_parts_segmented(self) -> None:
+        fmt = LedgerIdFormat(prefix="al", separator="_", segment_separator="_")
+        parts = fmt.parse_parts("al_content_0013")
+        assert parts.prefix == "al"
+        assert parts.number == 13
+        assert parts.segment == "content"
+
+    def test_parse_wrong_prefix(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="does not match"):
+            fmt.parse("run-0001")
+
+    def test_parse_invalid_number(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="does not match"):
+            fmt.parse("task-abc")
+
+    def test_next_from_empty(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert fmt.next([]) == "task-0001"
+
+    def test_next_from_existing(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert fmt.next(["task-0001", "task-0002"]) == "task-0003"
+
+    def test_next_ignores_non_matching(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert fmt.next(["run-0001", "task-0001"]) == "task-0002"
+
+    def test_next_segmented(self) -> None:
+        fmt = LedgerIdFormat(prefix="al", separator="_", segment_separator="_")
+        assert fmt.next([], segment="content") == "al_content_0001"
+        assert fmt.next(["al_content_0001"], segment="content") == "al_content_0002"
+
+    def test_next_separates_segments(self) -> None:
+        fmt = LedgerIdFormat(prefix="al", separator="_", segment_separator="_")
+        ids = ["al_content_0001", "al_0001"]
+        # next without segment only considers non-segmented
+        assert fmt.next(ids) == "al_0002"
+        # next with segment only considers that segment
+        assert fmt.next(ids, segment="content") == "al_content_0002"
+
+    def test_is_valid(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert fmt.is_valid("task-0001")
+        assert not fmt.is_valid("run-0001")
+        assert not fmt.is_valid("")
+        assert not fmt.is_valid(42)
+
+    def test_is_valid_segmented(self) -> None:
+        fmt = LedgerIdFormat(prefix="al", separator="_", segment_separator="_")
+        assert fmt.is_valid("al_0013")
+        assert fmt.is_valid("al_content_0013")
+        assert not fmt.is_valid("task-0001")
+
+    def test_filename(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert fmt.filename("task-0001", extension=".md") == "task-0001.md"
+
+    def test_reject_zero(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="positive"):
+            fmt.format(0)
+
+    def test_reject_negative(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="positive"):
+            fmt.format(-1)
+
+    def test_reject_boolean(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="boolean"):
+            fmt.format(True)  # type: ignore[arg-type]
+
+    def test_custom_width(self) -> None:
+        fmt = LedgerIdFormat(prefix="run", width=2)
+        assert fmt.format(3) == "run-03"
 
 
 class TestNumericIdFormat:

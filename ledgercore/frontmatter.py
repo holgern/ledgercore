@@ -144,3 +144,8 @@ def iter_markdown_files(
 ) -> list[Path]:
     """Iterate markdown files in sorted order."""
     return iter_source_files(directory, (".md",), recursive=recursive)
+
+
+# Compatibility aliases
+read_markdown_front_matter = read_front_matter_document
+write_markdown_front_matter = write_front_matter_document

@@ -10,6 +10,8 @@ from ledgercore.errors import PathValidationError
 from ledgercore.paths import (
     find_config_upwards,
     is_relative_to,
+    locate_config,
+    resolve_config_relative_path,
     resolve_relative_child,
     validate_relative_posix_path,
 )
@@ -54,6 +56,24 @@ class TestValidateRelativePosixPath:
         with pytest.raises(PathValidationError, match="myfield"):
             validate_relative_posix_path("", field_name="myfield")
 
+    def test_empty_segment(self) -> None:
+        with pytest.raises(PathValidationError, match="empty segment"):
+            validate_relative_posix_path("a//b")
+
+    def test_trailing_slash_rejected(self) -> None:
+        with pytest.raises(PathValidationError, match="trailing slash"):
+            validate_relative_posix_path("a/")
+
+    def test_trailing_slash_allowed(self) -> None:
+        assert validate_relative_posix_path("a/", allow_trailing_slash=True) == "a/"
+
+    def test_dot_slash(self) -> None:
+        with pytest.raises(PathValidationError, match="'.'"):
+            validate_relative_posix_path("./a")
+
+    def test_trailing_dot(self) -> None:
+        with pytest.raises(PathValidationError, match="'.'"):
+            validate_relative_posix_path("a/.")
 
 class TestResolveRelativeChild:
     def test_resolves(self, tmp_path: Path) -> None:
@@ -89,3 +109,96 @@ class TestFindConfigUpwards:
         config = tmp_path / "b.toml"
         config.write_text("test")
         assert find_config_upwards(tmp_path, ("a.toml", "b.toml")) == config
+
+    def test_search_from_file(self, tmp_path: Path) -> None:
+        config = tmp_path / "config.toml"
+        config.write_text("test")
+        child = tmp_path / "sub" / "file.py"
+        child.parent.mkdir(parents=True)
+        child.write_text("")
+        assert find_config_upwards(child, ("config.toml",)) == config
+
+
+class TestLocateConfig:
+    def test_finds_config(self, tmp_path: Path) -> None:
+        config = tmp_path / "myapp.toml"
+        config.write_text("test")
+        result = locate_config(tmp_path, ("myapp.toml",))
+        assert result is not None
+        assert result.config_path == config
+        assert result.workspace_root == tmp_path
+        assert result.source == "found"
+
+    def test_visible_preferred_over_hidden(self, tmp_path: Path) -> None:
+        visible = tmp_path / "myapp.toml"
+        hidden = tmp_path / ".myapp.toml"
+        visible.write_text("visible")
+        hidden.write_text("hidden")
+        result = locate_config(tmp_path, ("myapp.toml", ".myapp.toml"))
+        assert result is not None
+        assert result.config_path == visible
+
+    def test_hidden_found_when_requested(self, tmp_path: Path) -> None:
+        hidden = tmp_path / ".myapp.toml"
+        hidden.write_text("hidden")
+        result = locate_config(tmp_path, (".myapp.toml",))
+        assert result is not None
+        assert result.config_path == hidden
+
+    def test_no_config_no_default(self, tmp_path: Path) -> None:
+        result = locate_config(tmp_path, ("missing.toml",))
+        assert result is None
+
+    def test_default_filename(self, tmp_path: Path) -> None:
+        result = locate_config(
+            tmp_path, ("missing.toml",), default_filename="myapp.toml"
+        )
+        assert result is not None
+        assert result.source == "default"
+        assert result.config_path == (tmp_path / "myapp.toml").resolve()
+        assert result.workspace_root == tmp_path.resolve()
+
+    def test_search_from_nested_directory(self, tmp_path: Path) -> None:
+        config = tmp_path / "config.toml"
+        config.write_text("test")
+        nested = tmp_path / "a" / "b" / "c"
+        nested.mkdir(parents=True)
+        result = locate_config(nested, ("config.toml",))
+        assert result is not None
+        assert result.config_path == config
+
+    def test_search_from_file(self, tmp_path: Path) -> None:
+        config = tmp_path / "config.toml"
+        config.write_text("test")
+        start_file = tmp_path / "src" / "main.py"
+        start_file.parent.mkdir(parents=True)
+        start_file.write_text("")
+        result = locate_config(start_file, ("config.toml",))
+        assert result is not None
+        assert result.config_path == config
+
+
+class TestResolveConfigRelativePath:
+    def test_resolves_relative(self, tmp_path: Path) -> None:
+        config = tmp_path / "myapp.toml"
+        config.write_text("")
+        result = resolve_config_relative_path(
+            config, "data/store", field_name="storage_dir"
+        )
+        assert result == (tmp_path / "data" / "store").resolve()
+
+    def test_rejects_absolute(self, tmp_path: Path) -> None:
+        config = tmp_path / "myapp.toml"
+        config.write_text("")
+        with pytest.raises(PathValidationError, match="absolute"):
+            resolve_config_relative_path(
+                config, "/absolute/path", field_name="storage_dir"
+            )
+
+    def test_rejects_escape(self, tmp_path: Path) -> None:
+        config = tmp_path / "myapp.toml"
+        config.write_text("")
+        with pytest.raises(PathValidationError):
+            resolve_config_relative_path(
+                config, "../../escape", field_name="storage_dir"
+            )
