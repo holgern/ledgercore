@@ -7,14 +7,15 @@ section: introduction_and_goals
 title: Introduction and Goals
 order: 10
 status: accepted
-date: '2026-06-13'
+date: "2026-06-13"
 body_format: markdown
-created_at: '2026-06-13T08:41:40.792531+00:00'
-updated_at: '2026-06-13T08:55:57.283405+00:00'
+created_at: "2026-06-13T08:41:40.792531+00:00"
+updated_at: "2026-06-13T08:55:57.283405+00:00"
 source_refs:
-- path: README.md
-  reason: Purpose, goals, public scope, and non-goals
+  - path: README.md
+    reason: Purpose, goals, public scope, and non-goals
 ---
+
 # 1. Introduction and Goals
 
 ## Purpose
@@ -25,12 +26,12 @@ The library is embedded by a downstream Python application. It has no CLI, serve
 
 ## Stakeholders
 
-| Stakeholder | Concern |
-| --- | --- |
-| Downstream application developers | Stable, unsurprising primitives that are easy to compose and catch at an application boundary |
-| Maintainers | Small dependency surface, strict typing, focused modules, and deliberate compatibility |
-| Operators and users of downstream tools | Durable file updates, deterministic files, actionable failures, and path confinement |
-| Package releasers | Reproducible validation and conventional Python artifacts |
+| Stakeholder                             | Concern                                                                                       |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Downstream application developers       | Stable, unsurprising primitives that are easy to compose and catch at an application boundary |
+| Maintainers                             | Small dependency surface, strict typing, focused modules, and deliberate compatibility        |
+| Operators and users of downstream tools | Durable file updates, deterministic files, actionable failures, and path confinement          |
+| Package releasers                       | Reproducible validation and conventional Python artifacts                                     |
 
 ## Goals
 

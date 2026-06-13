@@ -14,9 +14,7 @@ import yaml
 from ledgercore.errors import FrontMatterError
 
 MissingFrontMatterMode = Literal["error", "empty"]
-BodyMode = Literal[
-    "preserve", "ensure-single-final-newline", "strip-leading-blank"
-]
+BodyMode = Literal["preserve", "ensure-single-final-newline", "strip-leading-blank"]
 ScalarStyle = Literal["minimal", "pyyaml"]
 RemainingKeyOrder = Literal["input", "sorted"]
 EmptyStringStyle = Literal["single", "double"]
@@ -35,6 +33,7 @@ class FrontMatterRenderOptions:
     empty_string_style: EmptyStringStyle = "single"
     quote_boolish_strings: bool = True
     quote_special_strings: bool = True
+
 
 _FRONT_MATTER_DELIM = "---"
 _TEMPLATE_VALUE = re.compile(
@@ -74,11 +73,7 @@ def _quote_template_values_anywhere(yaml_block: str) -> str:
         content = line.removesuffix("\n")
         newline = "\n" if line.endswith("\n") else ""
         stripped = content.lstrip()
-        if (
-            not stripped
-            or stripped.startswith(("#", "-"))
-            or ":" not in content
-        ):
+        if not stripped or stripped.startswith(("#", "-")) or ":" not in content:
             lines.append(line)
             continue
         prefix, value = content.split(":", 1)
@@ -126,9 +121,7 @@ def split_front_matter_text(
     if not normalized.startswith(_FRONT_MATTER_DELIM + "\n"):
         if missing == "empty":
             return {}, text
-        raise FrontMatterError(
-            "Document must start with '---' followed by a newline"
-        )
+        raise FrontMatterError("Document must start with '---' followed by a newline")
 
     yaml_block, body = _split_document(normalized)
     if not yaml_block.strip():
@@ -139,8 +132,7 @@ def split_front_matter_text(
         yaml_block = _quote_template_values_anywhere(yaml_block)
     elif quote_template_placeholders not in (False, "none"):
         raise ValueError(
-            "Unsupported template placeholder mode: "
-            f"{quote_template_placeholders}"
+            f"Unsupported template placeholder mode: {quote_template_placeholders}"
         )
 
     loader = (
@@ -156,8 +148,7 @@ def split_front_matter_text(
         return {}, body
     if not isinstance(loaded, dict):
         raise FrontMatterError(
-            "YAML front matter must be a mapping, "
-            f"got {type(loaded).__name__}"
+            f"YAML front matter must be a mapping, got {type(loaded).__name__}"
         )
     return dict(loaded), body
 
@@ -173,9 +164,7 @@ def _ordered_keys(
     if remaining_key_order == "sorted":
         remaining.sort()
     elif remaining_key_order != "input":
-        raise ValueError(
-            f"Unsupported remaining key order: {remaining_key_order}"
-        )
+        raise ValueError(f"Unsupported remaining key order: {remaining_key_order}")
     return ordered + remaining
 
 
@@ -192,9 +181,7 @@ _BOOLISH_STRINGS = {
 
 
 def _quote_minimal_string(value: str) -> str:
-    escaped = (
-        value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
-    )
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
     return f'"{escaped}"'
 
 
@@ -222,17 +209,10 @@ def _render_minimal_scalar(
             return "''"
         if empty_string_style == "double":
             return '""'
-        raise ValueError(
-            f"Unsupported empty string style: {empty_string_style}"
-        )
+        raise ValueError(f"Unsupported empty string style: {empty_string_style}")
     boolish = value.casefold() in _BOOLISH_STRINGS
-    special = (
-        value != value.strip()
-        or any(char in value for char in ":#[]{}\n\"\\")
-    )
-    if (quote_boolish_strings and boolish) or (
-        quote_special_strings and special
-    ):
+    special = value != value.strip() or any(char in value for char in ':#[]{}\n"\\')
+    if (quote_boolish_strings and boolish) or (quote_special_strings and special):
         return _quote_minimal_string(value)
     return value
 

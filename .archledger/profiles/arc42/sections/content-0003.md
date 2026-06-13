@@ -7,14 +7,15 @@ section: context_and_scope
 title: Context and Scope
 order: 30
 status: accepted
-date: '2026-06-13'
+date: "2026-06-13"
 body_format: markdown
-created_at: '2026-06-13T08:41:40.792531+00:00'
-updated_at: '2026-06-13T08:55:58.317204+00:00'
+created_at: "2026-06-13T08:41:40.792531+00:00"
+updated_at: "2026-06-13T08:55:58.317204+00:00"
 source_refs:
-- path: ledgercore/__init__.py
-  reason: Public integration boundary
+  - path: ledgercore/__init__.py
+    reason: Public integration boundary
 ---
+
 # 3. Context and Scope
 
 ```text
@@ -35,13 +36,13 @@ Local filesystem
 
 ## External interfaces
 
-| Interface | Contract |
-| --- | --- |
-| Python API | Functions, frozen dataclasses, literal policy arguments, and package exceptions |
-| Local filesystem | UTF-8 text; JSON, JSONL, YAML, and front-matter documents; atomic replacement where requested |
-| PyYAML | Safe YAML loading and dumping |
-| Environment variable | An optional caller-selected variable can disable fsync |
-| Clock | Current time is rendered at second precision with a `Z` suffix |
+| Interface            | Contract                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| Python API           | Functions, frozen dataclasses, literal policy arguments, and package exceptions               |
+| Local filesystem     | UTF-8 text; JSON, JSONL, YAML, and front-matter documents; atomic replacement where requested |
+| PyYAML               | Safe YAML loading and dumping                                                                 |
+| Environment variable | An optional caller-selected variable can disable fsync                                        |
+| Clock                | Current time is rendered at second precision with a `Z` suffix                                |
 
 ## Inside the boundary
 

@@ -35,11 +35,14 @@ class TestUtcNowIso:
 
     def test_offset_microseconds(self) -> None:
         now = datetime(2026, 1, 2, 3, 4, 5, 123456, tzinfo=timezone.utc)
-        assert utc_now_iso(
-            now=now,
-            timespec="microseconds",
-            timezone_style="offset",
-        ) == "2026-01-02T03:04:05.123456+00:00"
+        assert (
+            utc_now_iso(
+                now=now,
+                timespec="microseconds",
+                timezone_style="offset",
+            )
+            == "2026-01-02T03:04:05.123456+00:00"
+        )
 
     def test_rejects_naive_datetime(self) -> None:
         with pytest.raises(ValueError, match="timezone-aware"):

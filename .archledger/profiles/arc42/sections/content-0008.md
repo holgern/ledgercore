@@ -7,14 +7,15 @@ section: cross_cutting_concepts
 title: Cross-cutting Concepts
 order: 80
 status: accepted
-date: '2026-06-13'
+date: "2026-06-13"
 body_format: markdown
-created_at: '2026-06-13T08:41:40.792531+00:00'
-updated_at: '2026-06-13T08:56:00.859424+00:00'
+created_at: "2026-06-13T08:41:40.792531+00:00"
+updated_at: "2026-06-13T08:56:00.859424+00:00"
 source_refs:
-- path: ledgercore/paths.py
-  reason: Cross-cutting path validation and confinement
+  - path: ledgercore/paths.py
+    reason: Cross-cutting path validation and confinement
 ---
+
 # 8. Cross-cutting Concepts
 
 ## Errors

@@ -107,9 +107,7 @@ class TestFrontMatterText:
 
     def test_minimal_style_rejects_nested_mapping(self) -> None:
         with pytest.raises(FrontMatterError, match="nested"):
-            render_front_matter_text(
-                {"x": {"nested": True}}, scalar_style="minimal"
-            )
+            render_front_matter_text({"x": {"nested": True}}, scalar_style="minimal")
 
     def test_update_passes_minimal_render_options(self) -> None:
         updated = update_front_matter_text(

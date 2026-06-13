@@ -7,14 +7,15 @@ section: runtime_view
 title: Runtime View
 order: 60
 status: accepted
-date: '2026-06-13'
+date: "2026-06-13"
 body_format: markdown
-created_at: '2026-06-13T08:41:40.792531+00:00'
-updated_at: '2026-06-13T08:55:59.841090+00:00'
+created_at: "2026-06-13T08:41:40.792531+00:00"
+updated_at: "2026-06-13T08:55:59.841090+00:00"
 source_refs:
-- path: ledgercore/frontmatter.py
-  reason: Representative parsing and writing runtime flow
+  - path: ledgercore/frontmatter.py
+    reason: Representative parsing and writing runtime flow
 ---
+
 # 6. Runtime View
 
 ## Atomic replacement

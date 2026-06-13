@@ -7,14 +7,15 @@ section: solution_strategy
 title: Solution Strategy
 order: 40
 status: accepted
-date: '2026-06-13'
+date: "2026-06-13"
 body_format: markdown
-created_at: '2026-06-13T08:41:40.792531+00:00'
-updated_at: '2026-06-13T08:55:58.826479+00:00'
+created_at: "2026-06-13T08:41:40.792531+00:00"
+updated_at: "2026-06-13T08:55:58.826479+00:00"
 source_refs:
-- path: ledgercore/atomic.py
-  reason: Core safety and composition strategy
+  - path: ledgercore/atomic.py
+    reason: Core safety and composition strategy
 ---
+
 # 4. Solution Strategy
 
 The architecture is a stateless utility library organized by technical concern. Each module offers a narrow contract and composes lower-level primitives instead of introducing services or framework abstractions.

@@ -42,7 +42,5 @@ def test_front_matter_fingerprint_preserves_timestamp_string_option() -> None:
 
 def test_front_matter_fingerprint_accepts_template_mode() -> None:
     text = "---\ntitle: {{title}}\n---\nBody\n"
-    fingerprint = front_matter_fingerprint(
-        text, quote_template_placeholders=True
-    )
+    fingerprint = front_matter_fingerprint(text, quote_template_placeholders=True)
     assert len(fingerprint.metadata_sha256) == 64

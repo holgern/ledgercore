@@ -102,14 +102,13 @@ class TestLoadJsonArray:
 
 class TestWriteJson:
     def test_dumps_defaults_match_write_contract(self) -> None:
-        assert dumps_json({"b": 1, "a": 2}) == (
-            '{\n  "a": 2,\n  "b": 1\n}\n'
-        )
+        assert dumps_json({"b": 1, "a": 2}) == ('{\n  "a": 2,\n  "b": 1\n}\n')
 
     def test_dumps_can_omit_final_newline(self) -> None:
-        assert dumps_json(
-            {"b": 1, "a": 2}, final_newline=False
-        ) == '{\n  "a": 2,\n  "b": 1\n}'
+        assert (
+            dumps_json({"b": 1, "a": 2}, final_newline=False)
+            == '{\n  "a": 2,\n  "b": 1\n}'
+        )
 
     def test_write_compact(self, tmp_path: Path) -> None:
         path = tmp_path / "compact.json"

@@ -40,9 +40,7 @@ def test_missing_strict_raises(tmp_path: Path) -> None:
 
 def test_load_rows_retains_line_numbers(tmp_path: Path) -> None:
     path = tmp_path / "records.jsonl"
-    path.write_text(
-        '{"id":"a"}\n# comment\n{"id":"b"}\n', encoding="utf-8"
-    )
+    path.write_text('{"id":"a"}\n# comment\n{"id":"b"}\n', encoding="utf-8")
     result = load_jsonl_object_rows(path, missing="empty")
     assert [(row.line, row.value["id"]) for row in result.rows] == [
         (1, "a"),
@@ -53,10 +51,7 @@ def test_load_rows_retains_line_numbers(tmp_path: Path) -> None:
 def test_load_object_map_reports_content_issues(tmp_path: Path) -> None:
     path = tmp_path / "manifest.jsonl"
     path.write_text(
-        '{"path":"a.md","sha":"1"}\n'
-        '{"sha":"missing"}\n'
-        '[]\n'
-        '{"path":"b.md","sha":"2"}\n',
+        '{"path":"a.md","sha":"1"}\n{"sha":"missing"}\n[]\n{"path":"b.md","sha":"2"}\n',
         encoding="utf-8",
     )
     result = load_jsonl_object_map(path, key="path", missing="empty")
@@ -70,8 +65,7 @@ def test_load_object_map_reports_content_issues(tmp_path: Path) -> None:
 def test_load_object_map_duplicate_last(tmp_path: Path) -> None:
     path = tmp_path / "manifest.jsonl"
     path.write_text(
-        '{"path":"a.md","sha":"1"}\n'
-        '{"path":"a.md","sha":"2"}\n',
+        '{"path":"a.md","sha":"1"}\n{"path":"a.md","sha":"2"}\n',
         encoding="utf-8",
     )
     result = load_jsonl_object_map(path, key="path", duplicate_keys="last")

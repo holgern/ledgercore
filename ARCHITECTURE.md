@@ -21,12 +21,12 @@ The library is embedded by a downstream Python application. It has no CLI, serve
 
 ## Stakeholders
 
-| Stakeholder | Concern |
-| --- | --- |
-| Downstream application developers | Stable, unsurprising primitives that are easy to compose and catch at an application boundary |
-| Maintainers | Small dependency surface, strict typing, focused modules, and deliberate compatibility |
-| Operators and users of downstream tools | Durable file updates, deterministic files, actionable failures, and path confinement |
-| Package releasers | Reproducible validation and conventional Python artifacts |
+| Stakeholder                             | Concern                                                                                       |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Downstream application developers       | Stable, unsurprising primitives that are easy to compose and catch at an application boundary |
+| Maintainers                             | Small dependency surface, strict typing, focused modules, and deliberate compatibility        |
+| Operators and users of downstream tools | Durable file updates, deterministic files, actionable failures, and path confinement          |
+| Package releasers                       | Reproducible validation and conventional Python artifacts                                     |
 
 ## Goals
 
@@ -70,15 +70,15 @@ The library is embedded by a downstream Python application. It has no CLI, serve
 
 # 2. Architecture Constraints
 
-| Constraint | Architectural consequence |
-| --- | --- |
-| Python 3.10 or newer | Modern annotations, dataclasses, literals, and `pathlib` are available |
+| Constraint                            | Architectural consequence                                                             |
+| ------------------------------------- | ------------------------------------------------------------------------------------- |
+| Python 3.10 or newer                  | Modern annotations, dataclasses, literals, and `pathlib` are available                |
 | PyYAML is the sole runtime dependency | YAML behavior follows safe PyYAML APIs; all other facilities use the standard library |
-| Typed package (`py.typed`) | Public behavior must remain statically consumable; strict mypy is the target |
-| Local filesystem abstraction | Atomicity and durability depend on host filesystem and OS semantics |
-| UTF-8 text files | Text readers and writers explicitly encode/decode UTF-8 |
-| No application framework | Downstream code owns logging, CLI output, configuration, and recovery |
-| Apache-2.0 distribution | Source and packages remain compatible with that license |
+| Typed package (`py.typed`)            | Public behavior must remain statically consumable; strict mypy is the target          |
+| Local filesystem abstraction          | Atomicity and durability depend on host filesystem and OS semantics                   |
+| UTF-8 text files                      | Text readers and writers explicitly encode/decode UTF-8                               |
+| No application framework              | Downstream code owns logging, CLI output, configuration, and recovery                 |
+| Apache-2.0 distribution               | Source and packages remain compatible with that license                               |
 
 ## Product constraints
 
@@ -124,13 +124,13 @@ Local filesystem
 
 ## External interfaces
 
-| Interface | Contract |
-| --- | --- |
-| Python API | Functions, frozen dataclasses, literal policy arguments, and package exceptions |
-| Local filesystem | UTF-8 text; JSON, JSONL, YAML, and front-matter documents; atomic replacement where requested |
-| PyYAML | Safe YAML loading and dumping |
-| Environment variable | An optional caller-selected variable can disable fsync |
-| Clock | Current time is rendered at second precision with a `Z` suffix |
+| Interface            | Contract                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| Python API           | Functions, frozen dataclasses, literal policy arguments, and package exceptions               |
+| Local filesystem     | UTF-8 text; JSON, JSONL, YAML, and front-matter documents; atomic replacement where requested |
+| PyYAML               | Safe YAML loading and dumping                                                                 |
+| Environment variable | An optional caller-selected variable can disable fsync                                        |
+| Clock                | Current time is rendered at second precision with a `Z` suffix                                |
 
 ## Inside the boundary
 
@@ -151,8 +151,6 @@ Local filesystem
 - Choice of ledger codes, kinds, and relation semantics
 
 The downstream application owns all persisted data. `ledgercore` keeps no catalog or process-global state.
-
-
 
 ## Business Context
 
@@ -202,22 +200,22 @@ ledgercore
 └── public facade: __init__
 ```
 
-| Module | Responsibility | Dependencies |
-| --- | --- | --- |
-| `errors` | Shared exception hierarchy | None |
-| `atomic` | Atomic replacement and exclusive creation | OS, tempfile, errors |
-| `io` | Basic UTF-8 text, newline, merge, summary, and hash helpers | Standard library |
-| `jsonio` | Shape validation, deterministic and canonical JSON | atomic, errors |
-| `jsonl` | Recoverable object-per-line reads and deterministic writes | atomic, errors |
-| `yamlio` | Mapping-only YAML and deterministic output | PyYAML, atomic, errors |
-| `frontmatter` | YAML front matter and source iteration | PyYAML, atomic, errors |
-| `ids` | Configurable prefixed numeric IDs and slugs | Standard library |
-| `refs` | Canonical/local/file/legacy resource references | errors |
-| `paths` | Validation, confinement, and config discovery | pathlib, errors |
-| `path_text` | Human-authored path matching normalization | Unicode/regex stdlib |
-| `hashing` | SHA-256 and component fingerprints | frontmatter, jsonio |
-| `time` | Timestamp strings | datetime |
-| `__init__` | Curated package-level facade | Public modules |
+| Module        | Responsibility                                              | Dependencies           |
+| ------------- | ----------------------------------------------------------- | ---------------------- |
+| `errors`      | Shared exception hierarchy                                  | None                   |
+| `atomic`      | Atomic replacement and exclusive creation                   | OS, tempfile, errors   |
+| `io`          | Basic UTF-8 text, newline, merge, summary, and hash helpers | Standard library       |
+| `jsonio`      | Shape validation, deterministic and canonical JSON          | atomic, errors         |
+| `jsonl`       | Recoverable object-per-line reads and deterministic writes  | atomic, errors         |
+| `yamlio`      | Mapping-only YAML and deterministic output                  | PyYAML, atomic, errors |
+| `frontmatter` | YAML front matter and source iteration                      | PyYAML, atomic, errors |
+| `ids`         | Configurable prefixed numeric IDs and slugs                 | Standard library       |
+| `refs`        | Canonical/local/file/legacy resource references             | errors                 |
+| `paths`       | Validation, confinement, and config discovery               | pathlib, errors        |
+| `path_text`   | Human-authored path matching normalization                  | Unicode/regex stdlib   |
+| `hashing`     | SHA-256 and component fingerprints                          | frontmatter, jsonio    |
+| `time`        | Timestamp strings                                           | datetime               |
+| `__init__`    | Curated package-level facade                                | Public modules         |
 
 ## Dependency rules
 
@@ -227,8 +225,6 @@ ledgercore
 - No module owns mutable singleton state.
 
 Names exported from modules and the curated package `__all__` are intended API. Underscore-prefixed helpers are internal. Front matter compatibility aliases are public legacy surfaces.
-
-
 
 <!-- archledger: no accepted records for this section yet -->
 
@@ -280,8 +276,6 @@ The parser tries canonical, legacy underscore, file-safe, and local forms in ord
 
 Valid object rows are retained in order. Invalid JSON and non-object rows become line-numbered issues. File-level read failures raise a store exception.
 
-
-
 <!-- archledger: no accepted records for this section yet -->
 
 # Deployment View
@@ -319,8 +313,6 @@ Project metadata declares Python 3.10 through 3.13. The code is primarily OS-neu
 - Config discovery walks upward; source iteration returns a fully materialized sorted list.
 
 The deployment model fits repository-scale ledgers, not large datasets or high-throughput storage services.
-
-
 
 <!-- archledger: no accepted records for this section yet -->
 
@@ -366,28 +358,26 @@ Numbers are positive and normally padded to four digits. Generic IDs support sep
 
 Compatibility uses permissive input and canonical output. Public additions should be exported, documented, typed, and tested. Pytest covers behavior; Ruff and strict mypy cover style and typing.
 
-
-
 <!-- archledger: no accepted records for this section yet -->
 
 # Architecture Decisions
 
 # 9. Architecture Decisions
 
-| Decision | Status | Consequence |
-| --- | --- | --- |
-| Stateless utility library, not a framework | Accepted | Downstream applications retain orchestration and policy |
-| Text files and standard formats | Accepted | Human inspection and version control are easy; no query engine or database transactions |
-| Atomic single-file writes by default | Accepted | Partial replacement is avoided at the cost of temp space and sync work |
-| Caller-controlled fsync | Accepted | Consumers may trade crash durability for speed explicitly |
-| Validate paths beneath a trusted base | Accepted | Common traversal is blocked; hostile symlink races remain out of scope |
-| PyYAML safe loading | Accepted | No arbitrary YAML object construction; YAML semantics still depend on PyYAML |
-| Canonical output with selected legacy inputs | Accepted | Stored form is stable while migrations remain practical |
-| Frozen dataclasses for parsed values | Accepted | Values are explicit and resistant to accidental mutation |
-| Package-specific exception categories | Accepted | Consumers avoid dependency-specific exception coupling |
-| No domain schemas or reverse dependencies | Accepted | Consumers validate domain data above primitive shapes |
-| Complete-file processing | Accepted | Simpler verification, but unsuitable for very large files |
-| Curated package facade | Accepted | Convenient imports require deliberate `__all__` maintenance |
+| Decision                                     | Status   | Consequence                                                                             |
+| -------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| Stateless utility library, not a framework   | Accepted | Downstream applications retain orchestration and policy                                 |
+| Text files and standard formats              | Accepted | Human inspection and version control are easy; no query engine or database transactions |
+| Atomic single-file writes by default         | Accepted | Partial replacement is avoided at the cost of temp space and sync work                  |
+| Caller-controlled fsync                      | Accepted | Consumers may trade crash durability for speed explicitly                               |
+| Validate paths beneath a trusted base        | Accepted | Common traversal is blocked; hostile symlink races remain out of scope                  |
+| PyYAML safe loading                          | Accepted | No arbitrary YAML object construction; YAML semantics still depend on PyYAML            |
+| Canonical output with selected legacy inputs | Accepted | Stored form is stable while migrations remain practical                                 |
+| Frozen dataclasses for parsed values         | Accepted | Values are explicit and resistant to accidental mutation                                |
+| Package-specific exception categories        | Accepted | Consumers avoid dependency-specific exception coupling                                  |
+| No domain schemas or reverse dependencies    | Accepted | Consumers validate domain data above primitive shapes                                   |
+| Complete-file processing                     | Accepted | Simpler verification, but unsuitable for very large files                               |
+| Curated package facade                       | Accepted | Convenient imports require deliberate `__all__` maintenance                             |
 
 Decision drivers are source-control friendliness, minimal dependencies, clear downstream ownership, deterministic behavior, and prevention of common filesystem corruption and traversal mistakes. The implementation does not claim database-grade transactions or security in an adversarial filesystem.
 
@@ -405,22 +395,20 @@ Decision drivers are source-control friendliness, minimal dependencies, clear do
 - **Compatibility:** Python 3.10+, canonical output, supported legacy inputs, UTF-8
 - **Performance:** low overhead for repository-scale files and explicit fsync tradeoff
 
-| ID | Scenario | Expected response |
-| --- | --- | --- |
-| Q-01 | Update an existing JSON state file | Readers see the old complete file or new complete file under normal replace semantics |
-| Q-02 | Two processes create the same path | At most one exclusive create succeeds |
-| Q-03 | YAML/JSON has the wrong root type | Loading raises the corresponding store error |
-| Q-04 | A path is absolute, traversing, empty-segmented, or backslash-based | Validation rejects it before use beneath the base |
-| Q-05 | Canonicalize the same mapping repeatedly | JSON bytes and SHA-256 remain identical |
-| Q-06 | JSONL contains good and malformed rows | Good rows are returned; each bad row has a line and issue code |
-| Q-07 | Read a supported legacy reference | It parses to a canonical immutable value |
-| Q-08 | Disposable data does not need crash durability | The caller can explicitly disable fsync |
-| Q-09 | A downstream boundary catches a failure | It can catch `LedgerCoreError` or a narrower subclass |
-| Q-10 | A public primitive changes | Pytest, Ruff, and strict mypy expose behavioral, style, and typing regressions |
+| ID   | Scenario                                                            | Expected response                                                                     |
+| ---- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Q-01 | Update an existing JSON state file                                  | Readers see the old complete file or new complete file under normal replace semantics |
+| Q-02 | Two processes create the same path                                  | At most one exclusive create succeeds                                                 |
+| Q-03 | YAML/JSON has the wrong root type                                   | Loading raises the corresponding store error                                          |
+| Q-04 | A path is absolute, traversing, empty-segmented, or backslash-based | Validation rejects it before use beneath the base                                     |
+| Q-05 | Canonicalize the same mapping repeatedly                            | JSON bytes and SHA-256 remain identical                                               |
+| Q-06 | JSONL contains good and malformed rows                              | Good rows are returned; each bad row has a line and issue code                        |
+| Q-07 | Read a supported legacy reference                                   | It parses to a canonical immutable value                                              |
+| Q-08 | Disposable data does not need crash durability                      | The caller can explicitly disable fsync                                               |
+| Q-09 | A downstream boundary catches a failure                             | It can catch `LedgerCoreError` or a narrower subclass                                 |
+| Q-10 | A public primitive changes                                          | Pytest, Ruff, and strict mypy expose behavioral, style, and typing regressions        |
 
 Most functions are pure transformations or accept explicit paths and policies. Time supports injection, filesystem tests use temporary directories, and no global mutable state prevents isolation.
-
-
 
 ## Quality Requirements Overview
 
@@ -434,20 +422,20 @@ Most functions are pure transformations or accept explicit paths and policies. T
 
 # 11. Risks and Technical Debt
 
-| Risk / debt | Impact | Mitigation |
-| --- | --- | --- |
-| No inter-process lock or transactional ID allocator | Concurrent scans can choose the same ID | Pair with exclusive create and retry downstream |
-| Filesystem-dependent atomicity/fsync | Crash behavior varies on unusual or network filesystems | Colocate temp files and test target environments |
-| Symlink changes after path validation | Hostile writable trees can defeat confinement | Treat base trees as trusted; consider descriptor-relative APIs for hardened use |
-| Whole-file processing | Memory and latency scale with size | Restrict use to ledger-scale artifacts |
-| YAML implicit typing | Scalar interpretation can surprise | Safe loading, timestamp-string option, and downstream schemas |
-| Injected non-UTC datetime receives a `Z` suffix | Timestamp can be semantically incorrect | Normalize before calling; consider a versioned fix |
-| Error code declarations may drift from docs | Consumers may see inconsistent codes | Add subclass code tests before promising code-level stability |
-| Package facade may drift from module APIs | Imports/docs can lag | Review `__all__`, docs, and tests together |
-| Permissive reference aliases | Ambiguity pressure grows with kind formats | Prefer canonical form and apply allowlists |
-| Informal pre-1.0 compatibility | Upgrades may break consumers | Define deprecation/version policy before 1.0 |
-| No property-based or fault-injection tests | Rare parser and cleanup edges may escape | Add them where risk justifies complexity |
-| Architecture drift is not CI-gated | Documentation can become stale | Maintain source refs and run `archledger source changed` in review |
+| Risk / debt                                         | Impact                                                  | Mitigation                                                                      |
+| --------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| No inter-process lock or transactional ID allocator | Concurrent scans can choose the same ID                 | Pair with exclusive create and retry downstream                                 |
+| Filesystem-dependent atomicity/fsync                | Crash behavior varies on unusual or network filesystems | Colocate temp files and test target environments                                |
+| Symlink changes after path validation               | Hostile writable trees can defeat confinement           | Treat base trees as trusted; consider descriptor-relative APIs for hardened use |
+| Whole-file processing                               | Memory and latency scale with size                      | Restrict use to ledger-scale artifacts                                          |
+| YAML implicit typing                                | Scalar interpretation can surprise                      | Safe loading, timestamp-string option, and downstream schemas                   |
+| Injected non-UTC datetime receives a `Z` suffix     | Timestamp can be semantically incorrect                 | Normalize before calling; consider a versioned fix                              |
+| Error code declarations may drift from docs         | Consumers may see inconsistent codes                    | Add subclass code tests before promising code-level stability                   |
+| Package facade may drift from module APIs           | Imports/docs can lag                                    | Review `__all__`, docs, and tests together                                      |
+| Permissive reference aliases                        | Ambiguity pressure grows with kind formats              | Prefer canonical form and apply allowlists                                      |
+| Informal pre-1.0 compatibility                      | Upgrades may break consumers                            | Define deprecation/version policy before 1.0                                    |
+| No property-based or fault-injection tests          | Rare parser and cleanup edges may escape                | Add them where risk justifies complexity                                        |
+| Architecture drift is not CI-gated                  | Documentation can become stale                          | Maintain source refs and run `archledger source changed` in review              |
 
 Lack of multi-file transactions, indexing, remote access, and domain validation is an intentional boundary, not an incomplete feature list.
 
@@ -459,26 +447,26 @@ Lack of multi-file transactions, indexing, remote access, and domain validation 
 
 # 12. Glossary
 
-| Term | Meaning |
-| --- | --- |
-| Atomic create | Create the final path with exclusive OS flags without overwriting |
-| Atomic replace | Replace a path so ordinary readers do not observe partial target content |
-| Canonical JSON | Compact sorted-key JSON used for stable fingerprints |
-| Canonical reference | Global form `ledger:kind-number` |
-| Config locator | Immutable workspace root, config path, and source result |
-| Downstream application | A ledger product that imports `ledgercore` |
-| File-safe reference | Global alias such as `tl-task-0001` |
-| Fingerprint | SHA-256 digest for text or canonical data |
-| Front matter | YAML mapping delimited by `---` at the beginning of a text document |
-| Global reference | Identity containing ledger namespace and local ID |
-| Ledger | File-backed collection of records owned by a downstream application |
-| Ledger code | Short namespace token such as `tl`, `al`, or `sw` |
-| Local ID | Identity without namespace, such as `task-0001` |
-| Normalization | Converting accepted variants consistently; not security validation |
-| Path confinement | Requiring a resolved path to remain under a trusted base |
-| Resource kind | Record-type token such as `task` or `quality-requirement` |
-| Source-first documentation | Canonical architecture fragments from which builds are derived |
-| Store error | Package error for malformed structured data or file I/O |
-| Whole-file processing | Reading or constructing a complete artifact in memory |
+| Term                       | Meaning                                                                  |
+| -------------------------- | ------------------------------------------------------------------------ |
+| Atomic create              | Create the final path with exclusive OS flags without overwriting        |
+| Atomic replace             | Replace a path so ordinary readers do not observe partial target content |
+| Canonical JSON             | Compact sorted-key JSON used for stable fingerprints                     |
+| Canonical reference        | Global form `ledger:kind-number`                                         |
+| Config locator             | Immutable workspace root, config path, and source result                 |
+| Downstream application     | A ledger product that imports `ledgercore`                               |
+| File-safe reference        | Global alias such as `tl-task-0001`                                      |
+| Fingerprint                | SHA-256 digest for text or canonical data                                |
+| Front matter               | YAML mapping delimited by `---` at the beginning of a text document      |
+| Global reference           | Identity containing ledger namespace and local ID                        |
+| Ledger                     | File-backed collection of records owned by a downstream application      |
+| Ledger code                | Short namespace token such as `tl`, `al`, or `sw`                        |
+| Local ID                   | Identity without namespace, such as `task-0001`                          |
+| Normalization              | Converting accepted variants consistently; not security validation       |
+| Path confinement           | Requiring a resolved path to remain under a trusted base                 |
+| Resource kind              | Record-type token such as `task` or `quality-requirement`                |
+| Source-first documentation | Canonical architecture fragments from which builds are derived           |
+| Store error                | Package error for malformed structured data or file I/O                  |
+| Whole-file processing      | Reading or constructing a complete artifact in memory                    |
 
 <!-- archledger: no accepted records for this section yet -->

@@ -23,9 +23,10 @@ from ledgercore.paths import (
 class TestBaseRelativeHelpers:
     def test_inside_and_same_are_accepted(self, tmp_path: Path) -> None:
         assert ensure_inside_base(tmp_path, tmp_path) == tmp_path.resolve()
-        assert ensure_inside_base(
-            tmp_path, tmp_path / "child"
-        ) == (tmp_path / "child").resolve()
+        assert (
+            ensure_inside_base(tmp_path, tmp_path / "child")
+            == (tmp_path / "child").resolve()
+        )
 
     def test_outside_is_rejected(self, tmp_path: Path) -> None:
         with pytest.raises(PathValidationError, match="escapes"):

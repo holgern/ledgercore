@@ -35,6 +35,7 @@ _WIDE_PUNCTUATION = {
 
 def decode_unicode_escape_literals(value: str) -> str:
     """Decode only literal Unicode escape sequences."""
+
     def replace(match: re.Match[str]) -> str:
         digits = match.group(1) or match.group(2)
         return chr(int(digits, 16))
