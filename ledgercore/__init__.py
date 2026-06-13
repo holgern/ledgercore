@@ -8,11 +8,19 @@ except ModuleNotFoundError as exc:
     __version__ = "0.0.0+unknown"
 
 from ledgercore.atomic import atomic_create_text, atomic_write_text
+from ledgercore.config import (
+    LEDGER_CONFIG_FILENAMES,
+    ledger_config_filenames,
+    locate_ledger_config,
+    select_project_config,
+    select_tool_config,
+)
 from ledgercore.errors import (
     AtomicWriteError,
     FrontMatterError,
     IdFormatError,
     JsonStoreError,
+    LedgerConfigError,
     LedgerCoreError,
     PathValidationError,
     StorageError,
@@ -110,10 +118,16 @@ __all__ = [
     "__version__",
     "atomic_create_text",
     "atomic_write_text",
+    "LEDGER_CONFIG_FILENAMES",
+    "ledger_config_filenames",
+    "locate_ledger_config",
+    "select_project_config",
+    "select_tool_config",
     "AtomicWriteError",
     "FrontMatterError",
     "IdFormatError",
     "JsonStoreError",
+    "LedgerConfigError",
     "LedgerCoreError",
     "PathValidationError",
     "StorageError",

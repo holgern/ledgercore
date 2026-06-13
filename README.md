@@ -224,11 +224,10 @@ timestamp = utc_now_iso(timespec="microseconds", timezone_style="offset")
 
 ```python
 from pathlib import Path
-from ledgercore.paths import (
-    ConfigLocator, locate_config, resolve_config_relative_path,
-)
+from ledgercore.config import locate_ledger_config
+from ledgercore.paths import resolve_config_relative_path
 
-locator = locate_config(Path.cwd(), ("ledger.toml", ".ledger.toml"))
+locator = locate_ledger_config(Path.cwd())
 if locator is not None:
     records_dir = resolve_config_relative_path(
         locator.config_path,
@@ -237,15 +236,54 @@ if locator is not None:
     )
 ```
 
-`locate_config` returns a `ConfigLocator` with `workspace_root`, `config_path`,
-and `source` fields. Path helpers reject absolute paths, `..`, `.` segments,
-backslashes, and paths escaping the base directory.
+`locate_ledger_config` prefers `.ledger.toml`, then `ledger.toml`, and returns
+a `ConfigLocator` with `workspace_root`, `config_path`, and `source` fields.
+Path helpers reject absolute paths, `..`, `.` segments, backslashes, and paths
+escaping the base directory.
 
 Use `ensure_inside_base`, `relative_to_base`, and `resolve_under_base` when
 converting between resolved paths and safe base-relative paths. The separate
 `normalize_path_text` helper is for matching human-authored path text; it does
 not authorize filesystem access. It supports `"basic"`, `"wide"`, and
 `"none"` punctuation profiles plus custom translations.
+
+## Shared ledger config convention
+
+Ledgercore-based tools should use `.ledger.toml` as the canonical workspace
+config. Shared project metadata belongs under `[project]`; tool-specific
+configuration belongs under `[tools.<tool-name>]`.
+
+```toml
+schema_version = 1
+
+[project]
+uuid = "565c0312-b531-4d07-aa1f-32c796f58dae"
+name = "example"
+
+[tools.example]
+config_version = 1
+state_dir = ".example"
+```
+
+Ledgercore standardizes discovery and generic table selection; it does not
+parse TOML or define downstream schemas. Applications remain responsible for
+parsing the selected file and may pass legacy names as fallbacks:
+
+```python
+from ledgercore.config import (
+    locate_ledger_config,
+    select_project_config,
+    select_tool_config,
+)
+
+locator = locate_ledger_config(
+    Path.cwd(),
+    legacy_filenames=(".example.toml", "example.toml"),
+)
+```
+
+Canonical files win over legacy fallbacks. Applications should not implicitly
+merge both live configs.
 
 ## Atomic writes
 
@@ -266,7 +304,7 @@ All package-specific errors inherit from `LedgerCoreError`.
 
 ```python
 from ledgercore.errors import (
-    LedgerCoreError, StorageError, AtomicWriteError,
+    LedgerCoreError, LedgerConfigError, StorageError, AtomicWriteError,
     FrontMatterError, JsonStoreError, YamlStoreError,
     PathValidationError, IdFormatError,
 )

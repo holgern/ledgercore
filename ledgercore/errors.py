@@ -12,6 +12,12 @@ class LedgerCoreError(Exception):
             self.code = code
 
 
+class LedgerConfigError(LedgerCoreError):
+    """Raised when a shared ledger config table is missing or invalid."""
+
+    code: str = "LEDGER_CONFIG_ERROR"
+
+
 class StorageError(LedgerCoreError):
     """Base exception for storage-related errors."""
 

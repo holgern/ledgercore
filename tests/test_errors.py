@@ -7,6 +7,7 @@ from ledgercore.errors import (
     FrontMatterError,
     IdFormatError,
     JsonStoreError,
+    LedgerConfigError,
     LedgerCoreError,
     PathValidationError,
     StorageError,
@@ -32,6 +33,7 @@ class TestLedgerCoreError:
     def test_default_subclass_codes(self) -> None:
         cases = [
             (LedgerCoreError, "LEDGERCORE_ERROR"),
+            (LedgerConfigError, "LEDGER_CONFIG_ERROR"),
             (StorageError, "STORAGE_ERROR"),
             (AtomicWriteError, "ATOMIC_WRITE_ERROR"),
             (FrontMatterError, "FRONTMATTER_ERROR"),
@@ -56,6 +58,7 @@ class TestLedgerCoreError:
             PathValidationError("e"),
             IdFormatError("f"),
             StorageError("g"),
+            LedgerConfigError("h"),
         ]
         for err in errors:
             assert isinstance(err, LedgerCoreError)

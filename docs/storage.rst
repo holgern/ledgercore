@@ -221,9 +221,10 @@ Config discovery
 .. code:: python
 
    from pathlib import Path
-   from ledgercore.paths import locate_config, resolve_config_relative_path
+   from ledgercore.config import locate_ledger_config
+   from ledgercore.paths import resolve_config_relative_path
 
-   locator = locate_config(Path.cwd(), ("ledger.toml", ".ledger.toml"))
+   locator = locate_ledger_config(Path.cwd())
    if locator is not None:
        records_dir = resolve_config_relative_path(
            locator.config_path,
@@ -231,8 +232,23 @@ Config discovery
            field_name="records_dir",
        )
 
-``locate_config`` walks upward from the starting directory, returning a
-``ConfigLocator`` with ``workspace_root``, ``config_path``, and ``source`` fields.
+``locate_ledger_config`` walks upward from the starting directory, preferring
+``.ledger.toml`` over ``ledger.toml``. It returns a ``ConfigLocator`` with
+``workspace_root``, ``config_path``, and ``source`` fields.
+
+Shared ledger config convention
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ledgercore-based tools should place shared project metadata under ``[project]``
+and tool-specific settings under ``[tools.<tool-name>]`` in ``.ledger.toml``.
+Ledgercore provides discovery and generic mapping selectors, but deliberately
+does not parse TOML or define tool schemas.
+
+Downstream applications may pass legacy filenames to
+``locate_ledger_config``. Canonical names are searched first, so a
+``.ledger.toml`` in the workspace wins over a legacy tool config. Applications
+should parse only the selected file rather than merging canonical and legacy
+configs implicitly.
 
 ``resolve_config_relative_path`` resolves a path relative to the config file's
 parent directory, applying the same safety checks.

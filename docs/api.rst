@@ -3,6 +3,29 @@ API reference
 
 Public API grouped by module.
 
+.. _ledgercoreconfig:
+
+``ledgercore.config``
+---------------------
+
+Shared ledger workspace config discovery and namespaced mapping selection.
+This module does not parse TOML or define tool-specific schemas.
+
+``LEDGER_CONFIG_FILENAMES``
+   Canonical hidden-first names: ``(".ledger.toml", "ledger.toml")``.
+
+``ledger_config_filenames(*legacy, include_visible=True)``
+   Append caller-provided legacy names after canonical names.
+
+``locate_ledger_config(start, *, legacy_filenames=(), ...)``
+   Locate a canonical config or legacy fallback.
+
+``select_project_config(document, *, table_name="project")``
+   Select the optional shared project mapping.
+
+``select_tool_config(document, tool_name, *, table_name="tools")``
+   Select a required tool mapping.
+
 .. _ledgercoreatomic:
 
 ``ledgercore.atomic``
@@ -34,6 +57,10 @@ Shared exception hierarchy with stable error codes.
 | ``LedgerCoreError``     | ``LEDGERCORE_ERROR``      | Base exception for   |
 |                         |                           | all ledgercore       |
 |                         |                           | errors.              |
++-------------------------+---------------------------+----------------------+
+| ``LedgerConfigError``   | ``LEDGER_CONFIG_ERROR``   | Raised for missing   |
+|                         |                           | or invalid shared    |
+|                         |                           | config tables.       |
 +-------------------------+---------------------------+----------------------+
 | ``StorageError``        | ``STORAGE_ERROR``         | Base exception for   |
 |                         |                           | storage-related      |
