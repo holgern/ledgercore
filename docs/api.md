@@ -7,9 +7,9 @@ Public API grouped by module.
 Atomic UTF-8 text writes and race-safe file creation.
 
 | Function                                                                                  | Description                                                         |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------- |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `atomic_write_text(path, contents, *, normalize=False, fsync=True, fast_io_env_var=None)` | Write text to a file atomically using a temp file and `os.replace`. |
-| `atomic_create_text(path, contents, *, fsync=True, fast_io_env_var=None)`                 | Create a new file atomically using `O_CREAT                         | O_EXCL`. Fails if target exists. |
+| `atomic_create_text(path, contents, *, fsync=True, fast_io_env_var=None)`                 | Create a new file atomically using exclusive creation flags.       |
 
 ## `ledgercore.errors`
 
@@ -36,6 +36,11 @@ YAML front matter reader/writer and source file iteration.
 | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | `MissingFrontMatterMode`                                                                  | Literal type: `"error"` or `"empty"`.                            |
 | `BodyMode`                                                                                | Body preservation and newline normalization policy.              |
+| `ScalarStyle`                                                                             | Literal type: `"pyyaml"` or `"minimal"`.                         |
+| `RemainingKeyOrder`                                                                       | Literal type: `"input"` or `"sorted"`.                           |
+| `EmptyStringStyle`                                                                        | Literal type: `"single"` or `"double"`.                          |
+| `TemplatePlaceholderMode`                                                                 | Boolean-compatible placeholder parsing mode.                     |
+| `FrontMatterRenderOptions`                                                                | Frozen collection of all front matter rendering options.         |
 | `split_front_matter_text(text, *, ...)`                                                   | Parse front matter from in-memory text.                           |
 | `render_front_matter_text(metadata, body="", *, ...)`                                     | Render ordered metadata and body.                                |
 | `update_front_matter_text(text, updates, *, ...)`                                         | Merge metadata updates into in-memory text.                       |
@@ -81,7 +86,8 @@ Validated JSON object/array loading and deterministic JSON writing.
 | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `load_json_object(path, *, label="JSON document", missing="error", empty="empty")` | Load and validate a JSON object.                            |
 | `load_json_array(path, *, label="JSON document", missing="error", empty="empty")`  | Load and validate a JSON array.                             |
-| `write_json(path, payload, *, atomic=True)`                                        | Write JSON with indent 2, sorted keys, and a final newline. |
+| `dumps_json(payload, *, ...)`                                                     | Render configurable deterministic JSON text.               |
+| `write_json(path, payload, *, ...)`                                               | Write JSON with configurable indentation and compact mode.  |
 | `canonical_json(payload)`                                                          | Render compact sorted-key JSON for hashing.                 |
 
 ## `ledgercore.jsonl`
@@ -92,6 +98,12 @@ Recoverable JSON Lines object loading and deterministic writing.
 | ------------------------------------------- | ------------------------------------------------------------- |
 | `JsonlLoadIssue`                            | Frozen line issue: `line`, `code`, and `message`.             |
 | `JsonlLoadResult`                           | Valid `rows` plus recoverable `issues`.                       |
+| `JsonlObjectRow`                            | Valid object plus its source line number.                     |
+| `JsonlLoadRowsResult`                       | Line-aware valid rows plus recoverable issues.                |
+| `JsonlObjectMapLoadResult`                  | Object rows keyed by a selected string field plus issues.     |
+| `DuplicateKeyPolicy`                        | Literal type: `"last"`, `"first"`, or `"error"`.            |
+| `load_jsonl_object_rows(path, *, ...)`       | Load object rows while preserving source line numbers.        |
+| `load_jsonl_object_map(path, *, key, ...)`   | Load object rows into a keyed map with recoverable issues.     |
 | `load_jsonl_objects(path, *, ...)`           | Load object rows while reporting malformed lines.             |
 | `write_jsonl_objects(path, rows, *, ...)`    | Write compact object rows atomically by default.              |
 
@@ -117,8 +129,9 @@ Safe relative POSIX path validation, config discovery, config-relative resolutio
 Human-authored path matching helpers. These functions do not authorize
 filesystem access.
 
-| Function                                | Description                                                   |
+| Symbol                                  | Description                                                   |
 | --------------------------------------- | ------------------------------------------------------------- |
+| `PunctuationProfile`                    | Literal type: `"basic"`, `"wide"`, or `"none"`.              |
 | `decode_unicode_escape_literals(value)` | Decode literal `\uXXXX` and `\UXXXXXXXX` sequences only.      |
 | `normalize_path_text(value, *, ...)`     | Normalize Unicode, punctuation, slashes, whitespace, and case. |
 
@@ -129,7 +142,7 @@ filesystem access.
 | `TextFingerprint`                     | Full, body, and canonical metadata SHA-256 values.      |
 | `sha256_text(text)`                    | Hash UTF-8 text.                                        |
 | `sha256_bytes(data)`                   | Hash bytes directly.                                    |
-| `front_matter_fingerprint(text, *, missing="empty")` | Fingerprint front matter document components. |
+| `front_matter_fingerprint(text, *, ...)` | Fingerprint components with front matter parser options. |
 
 ## `ledgercore.refs`
 
@@ -148,11 +161,13 @@ Canonical cross-ledger resource references.
 
 ## `ledgercore.time`
 
-UTC timestamp generation with second precision.
+UTC timestamp generation with configurable precision and suffix style.
 
-| Function        | Description                       |
-| --------------- | --------------------------------- |
-| `utc_now_iso()` | Returns `"YYYY-MM-DDTHH:MM:SSZ"`. |
+| Symbol          | Description                                                     |
+| --------------- | --------------------------------------------------------------- |
+| `Timespec`      | Supported `datetime.isoformat()` precision values.              |
+| `TimezoneStyle` | Literal type: `"z"` or `"offset"`.                             |
+| `utc_now_iso()` | Normalize an aware datetime to UTC and render ISO-8601 text.     |
 
 ## `ledgercore.yamlio`
 

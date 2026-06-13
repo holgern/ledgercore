@@ -174,24 +174,51 @@ For in-memory content, use `split_front_matter_text`,
 timestamp-as-string loading, template placeholders, key ordering, and body
 normalization are explicit options.
 
+Use `scalar_style="minimal"` for deterministic simple front matter:
+
+```python
+from ledgercore.frontmatter import render_front_matter_text
+
+text = render_front_matter_text(
+    {"title": "Example", "tags": ["one", "two"], "empty": ""},
+    scalar_style="minimal",
+    sequence_indent="  ",
+    empty_string_style="double",
+)
+```
+
+The default remains PyYAML-compatible. Render options also pass through update
+and file-writing helpers. Template parsing supports whole-value placeholders
+and a conservative `"anywhere"` mode for simple scalar values.
+
 ## JSON and YAML stores
 
 ```python
 from pathlib import Path
-from ledgercore.jsonio import load_json_object, write_json
+from ledgercore.jsonio import dumps_json, load_json_object, write_json
 from ledgercore.yamlio import load_yaml_object, write_yaml
 
 state_path = Path("state.json")
 write_json(state_path, {"next": 4})
 state = load_json_object(state_path, missing="empty")
+compact = dumps_json(state, compact=True)
 ```
 
 JSON output uses indent 2, sorted keys, and a final newline. YAML uses block
 style and can sort keys when requested.
 
 `canonical_json` produces compact deterministic JSON for hashing.
-`load_jsonl_objects` retains valid object rows while reporting malformed lines,
-and `write_jsonl_objects` writes one compact object per line atomically.
+`load_jsonl_object_rows` retains source lines. `load_jsonl_object_map` builds a
+keyed manifest while reporting missing, invalid, and duplicate keys.
+`write_jsonl_objects` writes one compact object per line atomically.
+
+Timestamp output supports precision and suffix control:
+
+```python
+from ledgercore.time import utc_now_iso
+
+timestamp = utc_now_iso(timespec="microseconds", timezone_style="offset")
+```
 
 ## Safe paths and config discovery
 
@@ -217,7 +244,8 @@ backslashes, and paths escaping the base directory.
 Use `ensure_inside_base`, `relative_to_base`, and `resolve_under_base` when
 converting between resolved paths and safe base-relative paths. The separate
 `normalize_path_text` helper is for matching human-authored path text; it does
-not authorize filesystem access.
+not authorize filesystem access. It supports `"basic"`, `"wide"`, and
+`"none"` punctuation profiles plus custom translations.
 
 ## Atomic writes
 
@@ -298,7 +326,7 @@ python -m mypy ledgercore
 ## Stability
 
 `ledgercore` is pre-1.0. Public APIs are intended to be stable within the
-0.1.x series, but breaking changes may still happen before 1.0.0 when needed
+0.2.x series, but breaking changes may still happen before 1.0.0 when needed
 to keep the core API small and consistent.
 
 - No CLI is included.

@@ -13,7 +13,12 @@ from ledgercore.errors import (
 )
 from ledgercore.frontmatter import (
     BodyMode,
+    EmptyStringStyle,
+    FrontMatterRenderOptions,
     MissingFrontMatterMode,
+    RemainingKeyOrder,
+    ScalarStyle,
+    TemplatePlaceholderMode,
     iter_markdown_files,
     iter_source_files,
     read_front_matter_document,
@@ -57,17 +62,25 @@ from ledgercore.io import (
 )
 from ledgercore.jsonio import (
     canonical_json,
+    dumps_json,
     load_json_array,
     load_json_object,
     write_json,
 )
 from ledgercore.jsonl import (
+    DuplicateKeyPolicy,
     JsonlLoadIssue,
     JsonlLoadResult,
+    JsonlLoadRowsResult,
+    JsonlObjectMapLoadResult,
+    JsonlObjectRow,
+    load_jsonl_object_map,
+    load_jsonl_object_rows,
     load_jsonl_objects,
     write_jsonl_objects,
 )
 from ledgercore.path_text import (
+    PunctuationProfile,
     decode_unicode_escape_literals,
     normalize_path_text,
 )
@@ -83,7 +96,7 @@ from ledgercore.paths import (
     resolve_under_base,
     validate_relative_posix_path,
 )
-from ledgercore.time import utc_now_iso
+from ledgercore.time import Timespec, TimezoneStyle, utc_now_iso
 from ledgercore.yamlio import load_yaml_object, write_yaml
 
 __all__ = [
@@ -98,7 +111,12 @@ __all__ = [
     "StorageError",
     "YamlStoreError",
     "BodyMode",
+    "EmptyStringStyle",
+    "FrontMatterRenderOptions",
     "MissingFrontMatterMode",
+    "RemainingKeyOrder",
+    "ScalarStyle",
+    "TemplatePlaceholderMode",
     "iter_markdown_files",
     "iter_source_files",
     "read_front_matter_document",
@@ -132,13 +150,21 @@ __all__ = [
     "summarize_text",
     "write_text",
     "canonical_json",
+    "dumps_json",
     "load_json_array",
     "load_json_object",
     "write_json",
     "JsonlLoadIssue",
     "JsonlLoadResult",
+    "JsonlLoadRowsResult",
+    "JsonlObjectMapLoadResult",
+    "JsonlObjectRow",
+    "DuplicateKeyPolicy",
+    "load_jsonl_object_map",
+    "load_jsonl_object_rows",
     "load_jsonl_objects",
     "write_jsonl_objects",
+    "PunctuationProfile",
     "decode_unicode_escape_literals",
     "normalize_path_text",
     "ConfigLocator",
@@ -152,6 +178,8 @@ __all__ = [
     "resolve_under_base",
     "validate_relative_posix_path",
     "utc_now_iso",
+    "Timespec",
+    "TimezoneStyle",
     "load_yaml_object",
     "write_yaml",
 ]

@@ -6,7 +6,10 @@ import hashlib
 from dataclasses import dataclass
 from typing import Literal
 
-from ledgercore.frontmatter import split_front_matter_text
+from ledgercore.frontmatter import (
+    TemplatePlaceholderMode,
+    split_front_matter_text,
+)
 from ledgercore.jsonio import canonical_json
 
 
@@ -30,10 +33,19 @@ def sha256_bytes(data: bytes) -> str:
 
 
 def front_matter_fingerprint(
-    text: str, *, missing: Literal["error", "empty"] = "empty"
+    text: str,
+    *,
+    missing: Literal["error", "empty"] = "empty",
+    preserve_yaml_timestamps_as_strings: bool = False,
+    quote_template_placeholders: TemplatePlaceholderMode = False,
 ) -> TextFingerprint:
     """Fingerprint a full document, parsed body, and canonical metadata."""
-    metadata, body = split_front_matter_text(text, missing=missing)
+    metadata, body = split_front_matter_text(
+        text,
+        missing=missing,
+        preserve_yaml_timestamps_as_strings=preserve_yaml_timestamps_as_strings,
+        quote_template_placeholders=quote_template_placeholders,
+    )
     return TextFingerprint(
         full_sha256=sha256_text(text),
         body_sha256=sha256_text(body),

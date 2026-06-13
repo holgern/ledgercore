@@ -74,6 +74,24 @@ text = render_front_matter_text(metadata, body, key_order=("id", "status"))
 Parsing can preserve YAML timestamps as strings and quote template
 placeholders. Rendering supports caller-defined key order and body modes.
 
+For deterministic front matter without PyYAML's formatting choices:
+
+```python
+text = render_front_matter_text(
+    {"title": "Example", "tags": ["one", "two"], "empty": ""},
+    "# Body\n",
+    scalar_style="minimal",
+    sequence_indent="  ",
+    empty_string_style="double",
+    remaining_key_order="sorted",
+)
+```
+
+The default `scalar_style="pyyaml"` preserves existing output. Minimal mode
+supports strings, booleans, integers, nulls, and flat scalar sequences.
+Use `quote_template_placeholders="anywhere"` to parse placeholders embedded
+in simple unquoted scalar values.
+
 ### Writing
 
 ```python
@@ -107,16 +125,19 @@ Both return sorted `list[Path]`.
 
 ```python
 from pathlib import Path
-from ledgercore.jsonio import load_json_object, load_json_array, write_json
+from ledgercore.jsonio import dumps_json, load_json_object, write_json
 
 path = Path("state.json")
 write_json(path, {"next": 4})
 state = load_json_object(path, missing="empty")
+compact = dumps_json(state, compact=True)
 ```
 
 - `load_json_object` validates that the root is a JSON object.
 - `load_json_array` validates that the root is a JSON array.
 - `write_json` produces deterministic output: indent 2, sorted keys, final newline.
+- `dumps_json` and `write_json` can change indentation, key sorting, ASCII
+  escaping, compact separators, and final-newline behavior.
 - All operations raise `JsonStoreError` on failure.
 
 Both loaders accept `missing="empty"` to return an empty container when the file
@@ -127,16 +148,17 @@ when the file is blank.
 
 ```python
 from pathlib import Path
-from ledgercore.jsonl import load_jsonl_objects, write_jsonl_objects
+from ledgercore.jsonl import load_jsonl_object_map, write_jsonl_objects
 
 path = Path("records.jsonl")
 write_jsonl_objects(path, [{"id": 1}, {"id": 2}])
-result = load_jsonl_objects(path, missing="empty")
+result = load_jsonl_object_map(path, key="id", missing="empty")
 ```
 
-Valid object rows remain ordered in `result.rows`. Invalid JSON and non-object
-values are reported with line numbers in `result.issues`. Writes are compact,
-deterministic, end with a newline when rows exist, and are atomic by default.
+`load_jsonl_object_rows` retains each valid object's source line.
+`load_jsonl_object_map` indexes rows by a selected field and reports missing,
+invalid, and duplicate keys in `issues`. Duplicate policy can be `"last"`,
+`"first"`, or `"error"`. Writes remain compact and deterministic.
 
 ## YAML store
 
@@ -202,3 +224,8 @@ checking.
 `normalize_path_text` is intentionally separate. It can normalize Unicode
 punctuation, backslashes, whitespace, and casing for matching, but its output
 must still pass the strict path helpers before filesystem use.
+
+The default punctuation profile preserves existing behavior. Use
+`punctuation_profile="wide"` for additional quote, prime, dash, and minus
+variants, `"none"` to disable named translations, or
+`punctuation_translation` to add application-specific matching substitutions.
