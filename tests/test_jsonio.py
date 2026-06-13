@@ -8,7 +8,16 @@ from pathlib import Path
 import pytest
 
 from ledgercore.errors import JsonStoreError
-from ledgercore.jsonio import load_json_array, load_json_object, write_json
+from ledgercore.jsonio import (
+    canonical_json,
+    load_json_array,
+    load_json_object,
+    write_json,
+)
+
+
+def test_canonical_json_is_compact_sorted_and_unicode() -> None:
+    assert canonical_json({"z": 1, "a": "é"}) == '{"a":"é","z":1}'
 
 
 class TestLoadJsonObject:

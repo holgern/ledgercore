@@ -21,8 +21,9 @@ reinvent them.
 
 - Atomic UTF-8 text writes and create-only writes.
 - YAML front matter read/write helpers.
-- Deterministic JSON and YAML file I/O.
+- Deterministic JSON, JSONL, and YAML file I/O.
 - Safe relative POSIX path validation.
+- Generic content fingerprints and path-text normalization.
 - Upward config discovery.
 - Prefixed numeric ID formatting.
 - Cross-ledger references such as `tl:task-0001`.
@@ -168,6 +169,11 @@ metadata, body = read_front_matter_document(path)
 Front matter documents must start with `---` followed by a newline and contain a
 YAML mapping. The body follows the closing `---` delimiter.
 
+For in-memory content, use `split_front_matter_text`,
+`render_front_matter_text`, and `update_front_matter_text`. Permissive parsing,
+timestamp-as-string loading, template placeholders, key ordering, and body
+normalization are explicit options.
+
 ## JSON and YAML stores
 
 ```python
@@ -182,6 +188,10 @@ state = load_json_object(state_path, missing="empty")
 
 JSON output uses indent 2, sorted keys, and a final newline. YAML uses block
 style and can sort keys when requested.
+
+`canonical_json` produces compact deterministic JSON for hashing.
+`load_jsonl_objects` retains valid object rows while reporting malformed lines,
+and `write_jsonl_objects` writes one compact object per line atomically.
 
 ## Safe paths and config discovery
 
@@ -203,6 +213,11 @@ if locator is not None:
 `locate_config` returns a `ConfigLocator` with `workspace_root`, `config_path`,
 and `source` fields. Path helpers reject absolute paths, `..`, `.` segments,
 backslashes, and paths escaping the base directory.
+
+Use `ensure_inside_base`, `relative_to_base`, and `resolve_under_base` when
+converting between resolved paths and safe base-relative paths. The separate
+`normalize_path_text` helper is for matching human-authored path text; it does
+not authorize filesystem access.
 
 ## Atomic writes
 
@@ -235,6 +250,26 @@ except LedgerCoreError as exc:
 ```
 
 Each exception carries a stable `code` attribute for programmatic handling.
+
+## Using ledgercore from a CLI application
+
+`ledgercore` does not depend on a CLI framework. Adapt its errors at the
+application boundary:
+
+```python
+from ledgercore.errors import LedgerCoreError
+
+def to_usage_error(exc: LedgerCoreError) -> UsageError:
+    return UsageError(str(exc))
+
+try:
+    load_application_state()
+except LedgerCoreError as exc:
+    raise to_usage_error(exc) from exc
+```
+
+This keeps exit codes, terminal formatting, and framework-specific exception
+types in the downstream application.
 
 ## Type checking
 

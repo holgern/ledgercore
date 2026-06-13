@@ -12,10 +12,21 @@ from ledgercore.errors import (
     YamlStoreError,
 )
 from ledgercore.frontmatter import (
+    BodyMode,
+    MissingFrontMatterMode,
     iter_markdown_files,
     iter_source_files,
     read_front_matter_document,
+    render_front_matter_text,
+    split_front_matter_text,
+    update_front_matter_text,
     write_front_matter_document,
+)
+from ledgercore.hashing import (
+    TextFingerprint,
+    front_matter_fingerprint,
+    sha256_bytes,
+    sha256_text,
 )
 from ledgercore.ids import (
     LedgerIdFormat,
@@ -44,14 +55,32 @@ from ledgercore.io import (
     summarize_text,
     write_text,
 )
-from ledgercore.jsonio import load_json_array, load_json_object, write_json
+from ledgercore.jsonio import (
+    canonical_json,
+    load_json_array,
+    load_json_object,
+    write_json,
+)
+from ledgercore.jsonl import (
+    JsonlLoadIssue,
+    JsonlLoadResult,
+    load_jsonl_objects,
+    write_jsonl_objects,
+)
+from ledgercore.path_text import (
+    decode_unicode_escape_literals,
+    normalize_path_text,
+)
 from ledgercore.paths import (
     ConfigLocator,
+    ensure_inside_base,
     find_config_upwards,
     is_relative_to,
     locate_config,
+    relative_to_base,
     resolve_config_relative_path,
     resolve_relative_child,
+    resolve_under_base,
     validate_relative_posix_path,
 )
 from ledgercore.time import utc_now_iso
@@ -68,10 +97,19 @@ __all__ = [
     "PathValidationError",
     "StorageError",
     "YamlStoreError",
+    "BodyMode",
+    "MissingFrontMatterMode",
     "iter_markdown_files",
     "iter_source_files",
     "read_front_matter_document",
+    "render_front_matter_text",
+    "split_front_matter_text",
+    "update_front_matter_text",
     "write_front_matter_document",
+    "TextFingerprint",
+    "front_matter_fingerprint",
+    "sha256_bytes",
+    "sha256_text",
     "LedgerIdFormat",
     "LedgerIdParts",
     "NumericIdFormat",
@@ -93,15 +131,25 @@ __all__ = [
     "read_text",
     "summarize_text",
     "write_text",
+    "canonical_json",
     "load_json_array",
     "load_json_object",
     "write_json",
+    "JsonlLoadIssue",
+    "JsonlLoadResult",
+    "load_jsonl_objects",
+    "write_jsonl_objects",
+    "decode_unicode_escape_literals",
+    "normalize_path_text",
     "ConfigLocator",
+    "ensure_inside_base",
     "find_config_upwards",
     "is_relative_to",
     "locate_config",
+    "relative_to_base",
     "resolve_config_relative_path",
     "resolve_relative_child",
+    "resolve_under_base",
     "validate_relative_posix_path",
     "utc_now_iso",
     "load_yaml_object",

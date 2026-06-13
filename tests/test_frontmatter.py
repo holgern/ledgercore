@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -12,9 +13,84 @@ from ledgercore.frontmatter import (
     iter_source_files,
     read_front_matter_document,
     read_markdown_front_matter,
+    render_front_matter_text,
+    split_front_matter_text,
+    update_front_matter_text,
     write_front_matter_document,
     write_markdown_front_matter,
 )
+
+
+class TestFrontMatterText:
+    def test_missing_permissive_preserves_original_text(self) -> None:
+        text = "Body\r\nwithout header\r\n"
+        assert split_front_matter_text(text, missing="empty") == ({}, text)
+
+    def test_missing_strict_raises(self) -> None:
+        with pytest.raises(FrontMatterError, match="must start"):
+            split_front_matter_text("Body")
+
+    def test_timestamps_can_remain_strings(self) -> None:
+        metadata, _ = split_front_matter_text(
+            "---\ndate: 2026-06-13\nat: 2026-06-13T10:00:00Z\n---\n",
+            preserve_yaml_timestamps_as_strings=True,
+        )
+        assert metadata == {
+            "date": "2026-06-13",
+            "at": "2026-06-13T10:00:00Z",
+        }
+
+    def test_timestamp_option_does_not_change_default_loader(self) -> None:
+        split_front_matter_text(
+            "---\ndate: 2026-06-13\n---\n",
+            preserve_yaml_timestamps_as_strings=True,
+        )
+        metadata, _ = split_front_matter_text("---\ndate: 2026-06-13\n---\n")
+        assert metadata["date"] == date(2026, 6, 13)
+
+    def test_template_placeholder_can_be_quoted(self) -> None:
+        metadata, _ = split_front_matter_text(
+            "---\ntitle: {{title}}\n---\n",
+            quote_template_placeholders=True,
+        )
+        assert metadata == {"title": "{{title}}"}
+
+    def test_key_order_and_block_list(self) -> None:
+        rendered = render_front_matter_text(
+            {"title": "Example", "id": "x", "tags": ["a", "b"]},
+            key_order=("id", "title"),
+        )
+        assert rendered.index("id: x") < rendered.index("title: Example")
+        assert "tags:\n- a\n- b\n" in rendered
+
+    @pytest.mark.parametrize(
+        "value",
+        ["a: b", "a # b", "[value]", " padded ", "true", "null"],
+    )
+    def test_ambiguous_strings_are_quoted(self, value: str) -> None:
+        rendered = render_front_matter_text({"value": value})
+        metadata, _ = split_front_matter_text(rendered)
+        assert metadata["value"] == value
+
+    def test_native_scalars_are_unquoted(self) -> None:
+        rendered = render_front_matter_text({"enabled": True, "count": 2})
+        assert "enabled: true" in rendered
+        assert "count: 2" in rendered
+
+    def test_body_modes(self) -> None:
+        assert render_front_matter_text(
+            {}, "\nbody\n", body_mode="strip-leading-blank"
+        ).endswith("---\nbody\n")
+        assert render_front_matter_text(
+            {}, "body\n\n", body_mode="ensure-single-final-newline"
+        ).endswith("body\n")
+
+    def test_update_missing_document(self) -> None:
+        rendered = update_front_matter_text("Body\n", {"status": "new"})
+        assert split_front_matter_text(rendered) == (
+            {"status": "new"},
+            "Body\n",
+        )
 
 
 def _write_doc(path: Path, content: str) -> None:

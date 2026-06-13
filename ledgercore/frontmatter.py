@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+import re
+from collections.abc import Mapping, Sequence
+from copy import deepcopy
 from pathlib import Path
 from typing import Literal
 
@@ -10,9 +12,163 @@ import yaml
 
 from ledgercore.errors import FrontMatterError
 
-BodyMode = Literal["preserve", "ensure-single-final-newline"]
+MissingFrontMatterMode = Literal["error", "empty"]
+BodyMode = Literal[
+    "preserve", "ensure-single-final-newline", "strip-leading-blank"
+]
+ScalarStyle = Literal["minimal", "pyyaml"]
 
 _FRONT_MATTER_DELIM = "---"
+_TEMPLATE_VALUE = re.compile(
+    r"^(\s*[^#\n][^:\n]*:\s*)(\{\{[^{}\n]+\}\})(\s*(?:#.*)?)$",
+    re.MULTILINE,
+)
+
+
+class _StringTimestampSafeLoader(yaml.SafeLoader):
+    """Safe YAML loader that does not construct timestamps."""
+
+
+_StringTimestampSafeLoader.yaml_implicit_resolvers = deepcopy(
+    yaml.SafeLoader.yaml_implicit_resolvers
+)
+for first_char, resolvers in list(
+    _StringTimestampSafeLoader.yaml_implicit_resolvers.items()
+):
+    _StringTimestampSafeLoader.yaml_implicit_resolvers[first_char] = [
+        resolver
+        for resolver in resolvers
+        if resolver[0] != "tag:yaml.org,2002:timestamp"
+    ]
+
+
+def _quote_template_values(yaml_block: str) -> str:
+    def replace(match: re.Match[str]) -> str:
+        value = match.group(2).replace("'", "''")
+        return f"{match.group(1)}'{value}'{match.group(3)}"
+
+    return _TEMPLATE_VALUE.sub(replace, yaml_block)
+
+
+def _split_document(text: str) -> tuple[str, str]:
+    rest = text[len(_FRONT_MATTER_DELIM) + 1 :]
+    if rest.startswith(_FRONT_MATTER_DELIM + "\n"):
+        return "", rest[len(_FRONT_MATTER_DELIM) + 1 :]
+    if rest == _FRONT_MATTER_DELIM:
+        return "", ""
+
+    close = rest.find("\n" + _FRONT_MATTER_DELIM + "\n")
+    if close >= 0:
+        return (
+            rest[:close],
+            rest[close + len("\n" + _FRONT_MATTER_DELIM + "\n") :],
+        )
+    if rest.endswith("\n" + _FRONT_MATTER_DELIM):
+        return rest[: -len("\n" + _FRONT_MATTER_DELIM)], ""
+    raise FrontMatterError("No closing '---' delimiter found")
+
+
+def split_front_matter_text(
+    text: str,
+    *,
+    missing: MissingFrontMatterMode = "error",
+    preserve_yaml_timestamps_as_strings: bool = False,
+    quote_template_placeholders: bool = False,
+) -> tuple[dict[str, object], str]:
+    """Split YAML front matter from an in-memory document."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    if not normalized.startswith(_FRONT_MATTER_DELIM + "\n"):
+        if missing == "empty":
+            return {}, text
+        raise FrontMatterError(
+            "Document must start with '---' followed by a newline"
+        )
+
+    yaml_block, body = _split_document(normalized)
+    if not yaml_block.strip():
+        return {}, body
+    if quote_template_placeholders:
+        yaml_block = _quote_template_values(yaml_block)
+
+    loader = (
+        _StringTimestampSafeLoader
+        if preserve_yaml_timestamps_as_strings
+        else yaml.SafeLoader
+    )
+    try:
+        loaded = yaml.load(yaml_block, Loader=loader)
+    except yaml.YAMLError as exc:
+        raise FrontMatterError(f"Invalid YAML: {exc}") from exc
+    if loaded is None:
+        return {}, body
+    if not isinstance(loaded, dict):
+        raise FrontMatterError(
+            "YAML front matter must be a mapping, "
+            f"got {type(loaded).__name__}"
+        )
+    return dict(loaded), body
+
+
+def _ordered_metadata(
+    metadata: Mapping[str, object], key_order: Sequence[str]
+) -> dict[str, object]:
+    ordered: dict[str, object] = {}
+    for key in key_order:
+        if key in metadata:
+            ordered[key] = metadata[key]
+    for key, value in metadata.items():
+        if key not in ordered:
+            ordered[key] = value
+    return ordered
+
+
+def render_front_matter_text(
+    metadata: Mapping[str, object],
+    body: str = "",
+    *,
+    key_order: Sequence[str] = (),
+    body_mode: BodyMode = "preserve",
+    scalar_style: ScalarStyle = "minimal",
+) -> str:
+    """Render metadata and body as a YAML front matter document."""
+    if body_mode == "ensure-single-final-newline":
+        body = body.rstrip("\n") + "\n" if body else body
+    elif body_mode == "strip-leading-blank":
+        body = body.lstrip("\n")
+    elif body_mode != "preserve":
+        raise ValueError(f"Unsupported body mode: {body_mode}")
+    if scalar_style not in ("minimal", "pyyaml"):
+        raise ValueError(f"Unsupported scalar style: {scalar_style}")
+
+    yaml_block = yaml.safe_dump(
+        _ordered_metadata(metadata, key_order),
+        allow_unicode=True,
+        sort_keys=False,
+        default_flow_style=False,
+    )
+    if not yaml_block.endswith("\n"):
+        yaml_block += "\n"
+    return f"{_FRONT_MATTER_DELIM}\n{yaml_block}{_FRONT_MATTER_DELIM}\n{body}"
+
+
+def update_front_matter_text(
+    text: str,
+    updates: Mapping[str, object],
+    *,
+    missing: MissingFrontMatterMode = "empty",
+    key_order: Sequence[str] = (),
+    preserve_yaml_timestamps_as_strings: bool = False,
+    quote_template_placeholders: bool = False,
+) -> str:
+    """Update metadata in an in-memory front matter document."""
+    metadata, body = split_front_matter_text(
+        text,
+        missing=missing,
+        preserve_yaml_timestamps_as_strings=preserve_yaml_timestamps_as_strings,
+        quote_template_placeholders=quote_template_placeholders,
+    )
+    metadata.update(updates)
+    return render_front_matter_text(metadata, body, key_order=key_order)
 
 
 def read_front_matter_document(path: Path) -> tuple[dict[str, object], str]:
@@ -22,60 +178,10 @@ def read_front_matter_document(path: Path) -> tuple[dict[str, object], str]:
     except OSError as exc:
         raise FrontMatterError(f"Cannot read {path}: {exc}") from exc
 
-    raw = raw.replace("\r\n", "\n").replace("\r", "\n")
-
-    if not raw.startswith(_FRONT_MATTER_DELIM + "\n"):
-        raise FrontMatterError(
-            f"Document must start with '---' followed by a newline: {path}"
-        )
-
-    rest = raw[len(_FRONT_MATTER_DELIM) + 1 :]
-
-    # Look for closing --- followed by newline and body
-    close_with_body = rest.find("\n" + _FRONT_MATTER_DELIM + "\n")
-    # Look for closing --- at the very end of the document (no trailing body)
-    close_at_end = rest.endswith("\n" + _FRONT_MATTER_DELIM)
-    # Look for closing --- right at the start of rest (empty YAML block with body)
-    close_immediate_with_body = -1
-    if rest.startswith(_FRONT_MATTER_DELIM + "\n"):
-        close_immediate_with_body = 0
-    # Look for closing --- as the entirety of rest (empty YAML, no body)
-    close_immediate_at_end = rest == _FRONT_MATTER_DELIM
-
-    if close_with_body >= 0:
-        yaml_block = rest[:close_with_body]
-        body_start = close_with_body + len("\n" + _FRONT_MATTER_DELIM + "\n")
-        body = rest[body_start:]
-    elif close_immediate_with_body >= 0:
-        yaml_block = ""
-        body = rest[len(_FRONT_MATTER_DELIM) + 1 :]
-    elif close_immediate_at_end:
-        yaml_block = ""
-        body = ""
-    elif close_at_end:
-        yaml_block = rest[: len(rest) - len("\n" + _FRONT_MATTER_DELIM)]
-        body = ""
-    else:
-        raise FrontMatterError(f"No closing '---' delimiter found in {path}")
-
-    if not yaml_block.strip():
-        metadata: dict[str, object] = {}
-    else:
-        try:
-            loaded = yaml.safe_load(yaml_block)
-        except yaml.YAMLError as exc:
-            raise FrontMatterError(f"Invalid YAML in {path}: {exc}") from exc
-        if loaded is None:
-            metadata = {}
-        elif isinstance(loaded, dict):
-            metadata = loaded
-        else:
-            raise FrontMatterError(
-                f"YAML front matter must be a mapping,"
-                f" got {type(loaded).__name__}: {path}"
-            )
-
-    return metadata, body
+    try:
+        return split_front_matter_text(raw)
+    except FrontMatterError as exc:
+        raise FrontMatterError(f"{exc}: {path}") from exc
 
 
 def write_front_matter_document(
@@ -87,21 +193,7 @@ def write_front_matter_document(
     atomic: bool = True,
 ) -> None:
     """Write a YAML front matter document."""
-    yaml_block = yaml.safe_dump(
-        dict(metadata),
-        allow_unicode=True,
-        sort_keys=False,
-    )
-    if not yaml_block.endswith("\n"):
-        yaml_block += "\n"
-
-    if body_mode == "ensure-single-final-newline":
-        if body and not body.endswith("\n"):
-            body = body + "\n"
-        elif body.endswith("\n\n"):
-            body = body.rstrip("\n") + "\n"
-
-    content = f"{_FRONT_MATTER_DELIM}\n{yaml_block}{_FRONT_MATTER_DELIM}\n{body}"
+    content = render_front_matter_text(metadata, body, body_mode=body_mode)
 
     if atomic:
         from ledgercore.atomic import atomic_write_text

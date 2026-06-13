@@ -57,6 +57,23 @@ metadata, body = read_front_matter_document(Path("records/task-0001.md"))
 The YAML block must be a mapping. `metadata` is always a `dict`. `body`
 includes everything after the closing `---` delimiter.
 
+For content already held in memory:
+
+```python
+from ledgercore.frontmatter import (
+    render_front_matter_text,
+    split_front_matter_text,
+    update_front_matter_text,
+)
+
+metadata, body = split_front_matter_text(text, missing="empty")
+text = update_front_matter_text(text, {"status": "ready"})
+text = render_front_matter_text(metadata, body, key_order=("id", "status"))
+```
+
+Parsing can preserve YAML timestamps as strings and quote template
+placeholders. Rendering supports caller-defined key order and body modes.
+
 ### Writing
 
 ```python
@@ -105,6 +122,21 @@ state = load_json_object(path, missing="empty")
 Both loaders accept `missing="empty"` to return an empty container when the file
 does not exist, and `empty="empty"` (the default) to return an empty container
 when the file is blank.
+
+## JSONL store
+
+```python
+from pathlib import Path
+from ledgercore.jsonl import load_jsonl_objects, write_jsonl_objects
+
+path = Path("records.jsonl")
+write_jsonl_objects(path, [{"id": 1}, {"id": 2}])
+result = load_jsonl_objects(path, missing="empty")
+```
+
+Valid object rows remain ordered in `result.rows`. Invalid JSON and non-object
+values are reported with line numbers in `result.issues`. Writes are compact,
+deterministic, end with a newline when rows exist, and are atomic by default.
 
 ## YAML store
 
@@ -161,3 +193,12 @@ if locator is not None:
 
 `resolve_config_relative_path` resolves a path relative to the config file's
 parent directory, applying the same safety checks.
+
+For arbitrary resolved paths, use `ensure_inside_base` before access and
+`relative_to_base` when storing a POSIX relative path. `resolve_under_base`
+combines strict relative validation with containment and optional existence
+checking.
+
+`normalize_path_text` is intentionally separate. It can normalize Unicode
+punctuation, backslashes, whitespace, and casing for matching, but its output
+must still pass the strict path helpers before filesystem use.

@@ -3,10 +3,18 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
 from ledgercore.errors import JsonStoreError
+
+
+def canonical_json(payload: Mapping[str, object]) -> str:
+    """Return compact, deterministic JSON suitable for hashing."""
+    return json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    )
 
 
 def load_json_object(

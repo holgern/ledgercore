@@ -34,7 +34,11 @@ YAML front matter reader/writer and source file iteration.
 
 | Symbol                                                                                    | Description                                                      |
 | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `BodyMode`                                                                                | Literal type: `"preserve"` or `"ensure-single-final-newline"`.   |
+| `MissingFrontMatterMode`                                                                  | Literal type: `"error"` or `"empty"`.                            |
+| `BodyMode`                                                                                | Body preservation and newline normalization policy.              |
+| `split_front_matter_text(text, *, ...)`                                                   | Parse front matter from in-memory text.                           |
+| `render_front_matter_text(metadata, body="", *, ...)`                                     | Render ordered metadata and body.                                |
+| `update_front_matter_text(text, updates, *, ...)`                                         | Merge metadata updates into in-memory text.                       |
 | `read_front_matter_document(path)`                                                        | Read a YAML front matter document, returning `(metadata, body)`. |
 | `write_front_matter_document(path, metadata, body, *, body_mode="preserve", atomic=True)` | Write a YAML front matter document.                              |
 | `iter_source_files(directory, extensions, *, recursive=True)`                             | Iterate source files matching given extensions in sorted order.  |
@@ -78,6 +82,18 @@ Validated JSON object/array loading and deterministic JSON writing.
 | `load_json_object(path, *, label="JSON document", missing="error", empty="empty")` | Load and validate a JSON object.                            |
 | `load_json_array(path, *, label="JSON document", missing="error", empty="empty")`  | Load and validate a JSON array.                             |
 | `write_json(path, payload, *, atomic=True)`                                        | Write JSON with indent 2, sorted keys, and a final newline. |
+| `canonical_json(payload)`                                                          | Render compact sorted-key JSON for hashing.                 |
+
+## `ledgercore.jsonl`
+
+Recoverable JSON Lines object loading and deterministic writing.
+
+| Symbol                                      | Description                                                   |
+| ------------------------------------------- | ------------------------------------------------------------- |
+| `JsonlLoadIssue`                            | Frozen line issue: `line`, `code`, and `message`.             |
+| `JsonlLoadResult`                           | Valid `rows` plus recoverable `issues`.                       |
+| `load_jsonl_objects(path, *, ...)`           | Load object rows while reporting malformed lines.             |
+| `write_jsonl_objects(path, rows, *, ...)`    | Write compact object rows atomically by default.              |
 
 ## `ledgercore.paths`
 
@@ -88,10 +104,32 @@ Safe relative POSIX path validation, config discovery, config-relative resolutio
 | `is_relative_to(path, parent)`                                                          | Check whether path is relative to parent.                           |
 | `validate_relative_posix_path(value, *, field_name="path", allow_trailing_slash=False)` | Validate that a path is a safe relative POSIX path.                 |
 | `resolve_relative_child(base_dir, relative_path, *, field_name="path")`                 | Validate and resolve a relative path under a base directory.        |
+| `ensure_inside_base(base_dir, path, *, field_name="path")`                              | Resolve a path and reject paths outside the base.                    |
+| `relative_to_base(base_dir, path, *, field_name="path")`                                | Return a safe POSIX base-relative path string.                       |
+| `resolve_under_base(base_dir, relative_path, *, ...)`                                   | Resolve a safe relative path with optional existence checking.      |
 | `find_config_upwards(start, filenames)`                                                 | Walk from start upward, returning the first matching file, or None. |
 | `ConfigLocator`                                                                         | Frozen dataclass: `workspace_root`, `config_path`, `source`.        |
 | `locate_config(start, filenames, *, default_filename=None)`                             | Find a config file and return a `ConfigLocator`.                    |
 | `resolve_config_relative_path(config_path, value, *, field_name)`                       | Resolve a relative path relative to the config file's directory.    |
+
+## `ledgercore.path_text`
+
+Human-authored path matching helpers. These functions do not authorize
+filesystem access.
+
+| Function                                | Description                                                   |
+| --------------------------------------- | ------------------------------------------------------------- |
+| `decode_unicode_escape_literals(value)` | Decode literal `\uXXXX` and `\UXXXXXXXX` sequences only.      |
+| `normalize_path_text(value, *, ...)`     | Normalize Unicode, punctuation, slashes, whitespace, and case. |
+
+## `ledgercore.hashing`
+
+| Symbol                                | Description                                             |
+| ------------------------------------- | ------------------------------------------------------- |
+| `TextFingerprint`                     | Full, body, and canonical metadata SHA-256 values.      |
+| `sha256_text(text)`                    | Hash UTF-8 text.                                        |
+| `sha256_bytes(data)`                   | Hash bytes directly.                                    |
+| `front_matter_fingerprint(text, *, missing="empty")` | Fingerprint front matter document components. |
 
 ## `ledgercore.refs`
 
