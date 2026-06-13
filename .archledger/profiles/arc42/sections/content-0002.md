@@ -7,14 +7,15 @@ section: architecture_constraints
 title: Architecture Constraints
 order: 20
 status: accepted
-date: '2026-06-13'
+date: "2026-06-13"
 body_format: markdown
-created_at: '2026-06-13T08:41:40.792531+00:00'
-updated_at: '2026-06-13T11:05:13.161616+00:00'
+created_at: "2026-06-13T08:41:40.792531+00:00"
+updated_at: "2026-06-13T11:05:13.161616+00:00"
 source_refs:
-- path: pyproject.toml
-  reason: Runtime, packaging, typing, and toolchain constraints
+  - path: pyproject.toml
+    reason: Runtime, packaging, typing, and toolchain constraints
 ---
+
 # 2. Architecture Constraints
 
 | Constraint                            | Architectural consequence                                                             |

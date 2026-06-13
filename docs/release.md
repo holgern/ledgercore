@@ -47,6 +47,7 @@ test -f LICENSE
 
 6. Ensure examples run from the source tree with `PYTHONPATH=. python examples/*.py`
    (or after installing the package).
+
 ## Building
 
 ```bash

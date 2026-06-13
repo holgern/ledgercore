@@ -179,9 +179,7 @@ class TestFrontMatterText:
         ],
     )
     def test_minimal_quotes_yaml_hazards_in_sequence_items(self, value: str) -> None:
-        rendered = render_front_matter_text(
-            {"items": [value]}, scalar_style="minimal"
-        )
+        rendered = render_front_matter_text({"items": [value]}, scalar_style="minimal")
         metadata, _ = split_front_matter_text(
             rendered, preserve_yaml_timestamps_as_strings=True
         )

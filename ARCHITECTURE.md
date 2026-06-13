@@ -152,8 +152,6 @@ Local filesystem
 
 The downstream application owns all persisted data. `ledgercore` keeps no catalog or process-global state.
 
-
-
 ## Business Context
 
 <!-- archledger: no accepted records for this section yet -->
@@ -228,8 +226,6 @@ ledgercore
 
 Names exported from modules and the curated package `__all__` are intended API. Underscore-prefixed helpers are internal. Front matter compatibility aliases are public legacy surfaces.
 
-
-
 <!-- archledger: no accepted records for this section yet -->
 
 # Runtime View
@@ -280,8 +276,6 @@ The parser tries canonical, legacy underscore, file-safe, and local forms in ord
 
 Valid object rows are retained in order. Invalid JSON and non-object rows become line-numbered issues. File-level read failures raise a store exception.
 
-
-
 <!-- archledger: no accepted records for this section yet -->
 
 # Deployment View
@@ -319,8 +313,6 @@ Project metadata declares Python 3.10 through 3.13. The code is primarily OS-neu
 - Config discovery walks upward; source iteration returns a fully materialized sorted list.
 
 The deployment model fits repository-scale ledgers, not large datasets or high-throughput storage services.
-
-
 
 <!-- archledger: no accepted records for this section yet -->
 
@@ -365,8 +357,6 @@ Numbers are positive and normally padded to four digits. Formatting, parsing, an
 ## Evolution and testing
 
 Compatibility uses permissive input and canonical output. Public additions should be exported, documented, typed, and tested. Pytest covers behavior; Ruff and strict mypy cover style and typing.
-
-
 
 <!-- archledger: no accepted records for this section yet -->
 
@@ -419,8 +409,6 @@ Decision drivers are source-control friendliness, minimal dependencies, clear do
 | Q-10 | A public primitive changes                                          | Pytest, Ruff, and strict mypy expose behavioral, style, and typing regressions        |
 
 Most functions are pure transformations or accept explicit paths and policies. Time supports injection, filesystem tests use temporary directories, and no global mutable state prevents isolation.
-
-
 
 ## Quality Requirements Overview
 

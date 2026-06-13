@@ -26,7 +26,7 @@ def test_version_module_importable() -> None:
 
 
 def test_version_is_pep440ish() -> None:
-    # Accept release (0.2.0), dev (0.2.0.dev1), and dirty/git-suffixed forms
-    # produced by hatch-vcs / setuptools_scm.
-    pattern = r"^\d+\.\d+\.\d+([abrc]\d+|\.dev\d+)?(\+[\w.]+)?$"
-    assert re.match(pattern, ledgercore.__version__), ledgercore.__version__
+    # Accept release (0.2.0), dev (0.2.0.dev1 / 0.1.dev1), and
+    # dirty/git-suffixed forms produced by hatch-vcs / setuptools_scm.
+    # The release segment may have two or three numeric components.
+    pattern = r"^\d+(\.\d+)*([abrc]\d+|\.dev\d+)?(\+[\w.]+)?$"

@@ -7,14 +7,15 @@ section: risks_and_technical_debt
 title: Risks and Technical Debt
 order: 110
 status: accepted
-date: '2026-06-13'
+date: "2026-06-13"
 body_format: markdown
-created_at: '2026-06-13T08:41:40.792531+00:00'
-updated_at: '2026-06-13T11:05:13.954040+00:00'
+created_at: "2026-06-13T08:41:40.792531+00:00"
+updated_at: "2026-06-13T11:05:13.954040+00:00"
 source_refs:
-- path: ledgercore/time.py
-  reason: Known timestamp semantic limitation
+  - path: ledgercore/time.py
+    reason: Known timestamp semantic limitation
 ---
+
 # 11. Risks and Technical Debt
 
 | Risk / debt                                         | Impact                                                  | Mitigation                                                                      |

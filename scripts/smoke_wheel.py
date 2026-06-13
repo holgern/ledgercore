@@ -56,9 +56,7 @@ def main() -> int:
         "# Body\n",
         scalar_style="minimal",
     )
-    meta, body = split_front_matter_text(
-        text, preserve_yaml_timestamps_as_strings=True
-    )
+    meta, body = split_front_matter_text(text, preserve_yaml_timestamps_as_strings=True)
     assert meta["id"] == "task-0001"
     assert meta["flags"] == hazards
     assert body == "# Body\n"

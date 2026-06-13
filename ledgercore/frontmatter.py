@@ -227,7 +227,7 @@ def _render_minimal_scalar(
     nullish = folded in _NULLISH_STRINGS
     special = (
         value != value.strip()
-        or any(char in value for char in ":#[]{}\n\"\\")
+        or any(char in value for char in ':#[]{}\n"\\')
         or _SAFE_PLAIN_SCALAR_RE.fullmatch(value) is None
     )
     if (
