@@ -1,0 +1,36 @@
+---
+schema_version: 3
+id: content-0004
+kind: content
+type: section
+section: solution_strategy
+title: Solution Strategy
+order: 40
+status: accepted
+date: '2026-06-13'
+body_format: markdown
+created_at: '2026-06-13T08:41:40.792531+00:00'
+updated_at: '2026-06-13T08:55:58.826479+00:00'
+source_refs:
+- path: ledgercore/atomic.py
+  reason: Core safety and composition strategy
+---
+# 4. Solution Strategy
+
+The architecture is a stateless utility library organized by technical concern. Each module offers a narrow contract and composes lower-level primitives instead of introducing services or framework abstractions.
+
+1. **Filesystem safety by explicit primitives.** Atomic replacement writes a temporary sibling, optionally flushes it, calls `os.replace`, and optionally flushes the parent. Create-only writes use `O_CREAT | O_EXCL`.
+2. **Validation at format boundaries.** JSON/YAML loaders require the expected root shape; front matter requires a mapping; IDs, refs, and paths are parsed before use.
+3. **Canonical representations.** JSON hashing uses compact sorted-key output; JSON files use sorted keys and a final newline; references normalize aliases to one model.
+4. **Explicit policies.** Missing/empty handling, atomic writes, sorting, body normalization, recursion, aliases, allowlists, and fsync behavior are arguments.
+5. **Immutable value objects.** Parsed IDs, references, fingerprints, config locations, and JSONL results use frozen dataclasses.
+6. **Layered errors.** Modules wrap low-level parse and I/O failures in package-specific errors and preserve causes.
+7. **No retained state.** Calls depend only on arguments, filesystem state, environment, and clock.
+
+## Decomposition rationale
+
+- Serialization modules delegate atomic output to `atomic`.
+- `hashing` composes front matter parsing and canonical JSON.
+- `path_text` is separate from `paths`: normalization aids matching, while authorization requires strict validation.
+- `refs` and `ids` are separate because references add namespaces and aliases while generic IDs support configurable segments.
+- The package root provides discoverability; direct module imports permit narrow dependencies.
