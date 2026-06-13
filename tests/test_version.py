@@ -30,3 +30,4 @@ def test_version_is_pep440ish() -> None:
     # dirty/git-suffixed forms produced by hatch-vcs / setuptools_scm.
     # The release segment may have two or three numeric components.
     pattern = r"^\d+(\.\d+)*([abrc]\d+|\.dev\d+)?(\+[\w.]+)?$"
+    assert re.match(pattern, ledgercore.__version__)
