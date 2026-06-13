@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "ledgercore"
-version = "0.2.0"
+dynamic = ["version"]
 description = "Generic ledger and storage primitives for Python projects"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -46,6 +46,9 @@ release = [
     "build",
     "twine",
 ]
+
+[tool.hatch.version]
+source = "vcs"
 
 [tool.ruff]
 target-version = "py310"
