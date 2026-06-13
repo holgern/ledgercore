@@ -137,6 +137,56 @@ class TestFrontMatterText:
         assert "enabled: true" in rendered
         assert "count: 2" in rendered
 
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "- item",
+            "? key",
+            "*alias",
+            "&anchor",
+            "!tag",
+            "> folded",
+            "| literal",
+            "@bad",
+            "`bad",
+            "%YAML",
+            "~",
+            "2026-06-13",
+        ],
+    )
+    def test_minimal_style_quotes_yaml_plain_scalar_hazards(self, value: str) -> None:
+        rendered = render_front_matter_text({"value": value}, scalar_style="minimal")
+        metadata, _ = split_front_matter_text(
+            rendered, preserve_yaml_timestamps_as_strings=True
+        )
+        assert metadata["value"] == value
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "- item",
+            "? key",
+            "*alias",
+            "&anchor",
+            "!tag",
+            "> folded",
+            "| literal",
+            "@bad",
+            "`bad",
+            "%YAML",
+            "~",
+            "2026-06-13",
+        ],
+    )
+    def test_minimal_quotes_yaml_hazards_in_sequence_items(self, value: str) -> None:
+        rendered = render_front_matter_text(
+            {"items": [value]}, scalar_style="minimal"
+        )
+        metadata, _ = split_front_matter_text(
+            rendered, preserve_yaml_timestamps_as_strings=True
+        )
+        assert metadata["items"] == [value]
+
     def test_body_modes(self) -> None:
         assert render_front_matter_text(
             {}, "\nbody\n", body_mode="strip-leading-blank"

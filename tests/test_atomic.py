@@ -123,3 +123,22 @@ class TestAtomicCreateText:
             atomic_create_text(p, "new")
         assert exc_info.value.__cause__ is not None
         assert isinstance(exc_info.value.__cause__, FileExistsError)
+
+    def test_handles_partial_os_write(self, tmp_path: Path) -> None:
+        """A partial os.write must still produce a complete file."""
+        p = tmp_path / "f.txt"
+        content = "abcdefghij"
+
+        real_write = os.write
+        call = {"n": 0}
+
+        def short_write(fd: int, data: bytes) -> int:
+            # First call writes only the first byte; subsequent calls write normally.
+            call["n"] += 1
+            if call["n"] == 1:
+                return real_write(fd, data[:1])
+            return real_write(fd, data)
+
+        with patch("ledgercore.atomic.os.write", side_effect=short_write) as _:
+            atomic_create_text(p, content, fsync=False)
+        assert p.read_text(encoding="utf-8") == content

@@ -82,8 +82,8 @@ The library is embedded by a downstream Python application. It has no CLI, serve
 
 ## Product constraints
 
-- The package is pre-1.0 (`0.1.0`), with an intent to keep the 0.1.x public API stable where practical.
-- The top-level package re-exports a curated convenience API.
+- The package is pre-1.0 (`0.2.0`), with an intent to keep the 0.2.x public API stable where practical.
+- The top-level package re-exports a curated convenience API, including `__version__`.
 - Existing compatibility aliases and documented legacy reference syntax are retained.
 - Persisted formats must stay inspectable with ordinary text tools.
 
@@ -91,8 +91,8 @@ The library is embedded by a downstream Python application. It has no CLI, serve
 
 - Tests use pytest and mirror modules by concern.
 - Ruff and strict mypy define static quality expectations.
-- GitHub Actions covers tests, pre-commit, coverage, and publishing.
-- Releases are wheels and source distributions built with Hatchling.
+- GitHub Actions runs tests, pre-commit checks, coverage, and publishing workflows.
+- Releases are wheels and source distributions built with Hatchling; versions come from Git tags via hatch-vcs and are written to a gitignored `ledgercore/_version.py`.
 
 ## Filesystem assumptions
 
@@ -151,6 +151,8 @@ Local filesystem
 - Choice of ledger codes, kinds, and relation semantics
 
 The downstream application owns all persisted data. `ledgercore` keeps no catalog or process-global state.
+
+
 
 ## Business Context
 
@@ -226,6 +228,8 @@ ledgercore
 
 Names exported from modules and the curated package `__all__` are intended API. Underscore-prefixed helpers are internal. Front matter compatibility aliases are public legacy surfaces.
 
+
+
 <!-- archledger: no accepted records for this section yet -->
 
 # Runtime View
@@ -276,6 +280,8 @@ The parser tries canonical, legacy underscore, file-safe, and local forms in ord
 
 Valid object rows are retained in order. Invalid JSON and non-object rows become line-numbered issues. File-level read failures raise a store exception.
 
+
+
 <!-- archledger: no accepted records for this section yet -->
 
 # Deployment View
@@ -314,6 +320,8 @@ Project metadata declares Python 3.10 through 3.13. The code is primarily OS-neu
 
 The deployment model fits repository-scale ledgers, not large datasets or high-throughput storage services.
 
+
+
 <!-- archledger: no accepted records for this section yet -->
 
 # Cross-cutting Concepts
@@ -322,7 +330,7 @@ The deployment model fits repository-scale ledgers, not large datasets or high-t
 
 ## Errors
 
-Package failures derive from `LedgerCoreError`. Storage failures derive from `StorageError`; specialized categories identify atomic, front matter, JSON, YAML, path, and ID failures. Downstream applications render them at their own boundary.
+Package failures derive from `LedgerCoreError`. Storage failures derive from `StorageError`; specialized categories identify atomic, front matter, JSON, YAML, path, and ID failures. Each exception class exposes a stable `code` class attribute (`LEDGERCORE_ERROR`, `STORAGE_ERROR`, `ATOMIC_WRITE_ERROR`, `FRONTMATTER_ERROR`, `JSON_STORE_ERROR`, `YAML_STORE_ERROR`, `PATH_VALIDATION_ERROR`, `ID_FORMAT_ERROR`) for programmatic handling. Downstream applications render them at their own boundary.
 
 ## Determinism
 
@@ -336,7 +344,7 @@ Package failures derive from `LedgerCoreError`. Storage failures derive from `St
 
 ## Integrity and durability
 
-Atomic output is default for structured writers. Temp files live beside targets. Optional fsync covers contents and the parent directory. This prevents partial ordinary replacement but provides no rollback, locking, or multi-file transaction.
+Atomic output is default for structured writers. Temp files live beside targets. Optional fsync covers contents and the parent directory. This prevents partial ordinary replacement but provides no rollback, locking, or multi-file transaction. Race-safe creation loops `os.write()` to completion so partial writes cannot truncate a file.
 
 ## Path safety
 
@@ -344,19 +352,21 @@ Strict POSIX-relative validation rejects absolute paths, backslashes, empty segm
 
 ## Serialization
 
-YAML/object APIs and front matter accept mapping roots. JSON has separate object and array APIs. Missing and empty policies are explicit. Safe YAML loaders avoid arbitrary object construction. Timestamp strings and template placeholders have opt-in compatibility handling.
+YAML/object APIs and front matter accept mapping roots. JSON has separate object and array APIs. The `missing="empty"` policy returns an empty container only for absent files; an existing-but-unreadable path (such as a directory or a permission error) raises the store error instead of being masked. Safe YAML loaders avoid arbitrary object construction. The minimal front matter renderer quotes any string that is not a conservative safe plain scalar, or that folds to a YAML boolean or null token, so values such as `- item`, `*alias`, `~`, or `2026-06-13` round-trip without producing invalid YAML. Timestamp strings and template placeholders have opt-in compatibility handling.
 
 ## Identity
 
-Numbers are positive and normally padded to four digits. Generic IDs support separators and segments. Cross-ledger refs use `ledger:kind-number` canonically and accept selected aliases. Scan-based next-ID allocation is deterministic but not concurrency-safe.
+Numbers are positive and normally padded to four digits. Formatting, parsing, and validity checks consistently reject zero, negative, and boolean values. Generic IDs support separators and segments. Cross-ledger refs use `ledger:kind-number` canonically and accept selected aliases. Scan-based next-ID allocation is deterministic but not concurrency-safe.
 
 ## Time
 
-`utc_now_iso` emits second-precision strings ending in `Z`. An injected datetime is formatted directly; callers needing actual UTC conversion must normalize it first.
+`utc_now_iso` emits second-precision strings ending in `Z`. Aware injected datetimes are normalized to UTC before formatting; naive values are rejected.
 
 ## Evolution and testing
 
 Compatibility uses permissive input and canonical output. Public additions should be exported, documented, typed, and tested. Pytest covers behavior; Ruff and strict mypy cover style and typing.
+
+
 
 <!-- archledger: no accepted records for this section yet -->
 
@@ -410,6 +420,8 @@ Decision drivers are source-control friendliness, minimal dependencies, clear do
 
 Most functions are pure transformations or accept explicit paths and policies. Time supports injection, filesystem tests use temporary directories, and no global mutable state prevents isolation.
 
+
+
 ## Quality Requirements Overview
 
 <!-- archledger: no accepted records for this section yet -->
@@ -428,9 +440,8 @@ Most functions are pure transformations or accept explicit paths and policies. T
 | Filesystem-dependent atomicity/fsync                | Crash behavior varies on unusual or network filesystems | Colocate temp files and test target environments                                |
 | Symlink changes after path validation               | Hostile writable trees can defeat confinement           | Treat base trees as trusted; consider descriptor-relative APIs for hardened use |
 | Whole-file processing                               | Memory and latency scale with size                      | Restrict use to ledger-scale artifacts                                          |
-| YAML implicit typing                                | Scalar interpretation can surprise                      | Safe loading, timestamp-string option, and downstream schemas                   |
-| Injected non-UTC datetime receives a `Z` suffix     | Timestamp can be semantically incorrect                 | Normalize before calling; consider a versioned fix                              |
-| Error code declarations may drift from docs         | Consumers may see inconsistent codes                    | Add subclass code tests before promising code-level stability                   |
+| YAML implicit typing                                | Scalar interpretation can surprise                      | Safe loading, timestamp-string option, minimal quoting, and downstream schemas  |
+| Error code declarations may drift from docs         | Consumers may see inconsistent codes                    | Subclass code attributes are covered by tests before promising code stability   |
 | Package facade may drift from module APIs           | Imports/docs can lag                                    | Review `__all__`, docs, and tests together                                      |
 | Permissive reference aliases                        | Ambiguity pressure grows with kind formats              | Prefer canonical form and apply allowlists                                      |
 | Informal pre-1.0 compatibility                      | Upgrades may break consumers                            | Define deprecation/version policy before 1.0                                    |

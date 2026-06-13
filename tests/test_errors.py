@@ -29,6 +29,24 @@ class TestLedgerCoreError:
         assert isinstance(err, StorageError)
         assert isinstance(err, LedgerCoreError)
 
+    def test_default_subclass_codes(self) -> None:
+        cases = [
+            (LedgerCoreError, "LEDGERCORE_ERROR"),
+            (StorageError, "STORAGE_ERROR"),
+            (AtomicWriteError, "ATOMIC_WRITE_ERROR"),
+            (FrontMatterError, "FRONTMATTER_ERROR"),
+            (JsonStoreError, "JSON_STORE_ERROR"),
+            (YamlStoreError, "YAML_STORE_ERROR"),
+            (PathValidationError, "PATH_VALIDATION_ERROR"),
+            (IdFormatError, "ID_FORMAT_ERROR"),
+        ]
+        for cls, code in cases:
+            assert cls("message").code == code
+
+    def test_subclass_code_override(self) -> None:
+        err = StorageError("boom", code="CUSTOM")
+        assert err.code == "CUSTOM"
+
     def test_all_errors_are_ledgercore_errors(self) -> None:
         errors = [
             AtomicWriteError("a"),

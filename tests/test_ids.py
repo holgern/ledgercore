@@ -123,6 +123,20 @@ class TestLedgerIdFormat:
         with pytest.raises(ValueError, match="boolean"):
             fmt.format(True)  # type: ignore[arg-type]
 
+    def test_parse_rejects_zero(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="positive"):
+            fmt.parse("task-0000")
+
+    def test_parse_parts_rejects_zero(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="positive"):
+            fmt.parse_parts("task-0000")
+
+    def test_is_valid_rejects_zero(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        assert not fmt.is_valid("task-0000")
+
     def test_custom_width(self) -> None:
         fmt = LedgerIdFormat(prefix="run", width=2)
         assert fmt.format(3) == "run-03"
@@ -158,6 +172,26 @@ class TestNumericIdFormat:
         fmt = NumericIdFormat(prefix="task")
         with pytest.raises(ValueError, match="not a valid number"):
             fmt.parse("task-abc")
+
+    def test_format_rejects_zero(self) -> None:
+        fmt = NumericIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="positive"):
+            fmt.format(0)
+
+    def test_format_rejects_negative(self) -> None:
+        fmt = NumericIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="positive"):
+            fmt.format(-1)
+
+    def test_format_rejects_boolean(self) -> None:
+        fmt = NumericIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="boolean"):
+            fmt.format(True)  # type: ignore[arg-type]
+
+    def test_parse_rejects_zero(self) -> None:
+        fmt = NumericIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="positive"):
+            fmt.parse("task-0000")
 
     def test_next_from_empty(self) -> None:
         fmt = NumericIdFormat(prefix="task")

@@ -88,9 +88,14 @@ text = render_front_matter_text(
 ```
 
 The default `scalar_style="pyyaml"` preserves existing output. Minimal mode
-supports strings, booleans, integers, nulls, and flat scalar sequences.
-Use `quote_template_placeholders="anywhere"` to parse placeholders embedded
-in simple unquoted scalar values.
+supports strings, booleans, integers, nulls, and flat scalar sequences. The minimal
+renderer quotes any string that is not a conservative safe plain scalar
+(alphanumeric lead character followed by letters, digits, spaces, underscores,
+dots, slashes, or hyphens) and any value that folds to a YAML boolean or null
+token, so values such as `- item`, `*alias`, `~`, `no`, or `2026-06-13` round-trip
+without producing invalid YAML or silently changing type. Use
+`quote_template_placeholders="anywhere"` to parse placeholders embedded in simple
+unquoted scalar values.
 
 ### Writing
 
@@ -140,9 +145,10 @@ compact = dumps_json(state, compact=True)
   escaping, compact separators, and final-newline behavior.
 - All operations raise `JsonStoreError` on failure.
 
-Both loaders accept `missing="empty"` to return an empty container when the file
-does not exist, and `empty="empty"` (the default) to return an empty container
-when the file is blank.
+Both loaders accept `missing="empty"` to return an empty container only when the
+file does not exist; an unreadable path that does exist (for example a directory,
+or a permission error) raises `JsonStoreError` rather than being masked as empty.
+`empty="empty"` (the default) returns an empty container when the file is blank.
 
 ## JSONL store
 

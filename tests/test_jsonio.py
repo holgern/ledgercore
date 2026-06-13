@@ -56,6 +56,10 @@ class TestLoadJsonObject:
         result = load_json_object(p, missing="empty")
         assert result == {}
 
+    def test_missing_empty_does_not_mask_directory(self, tmp_path: Path) -> None:
+        with pytest.raises(JsonStoreError):
+            load_json_object(tmp_path, missing="empty")
+
     def test_empty_file_error(self, tmp_path: Path) -> None:
         p = tmp_path / "f.json"
         p.write_text("", encoding="utf-8")
@@ -86,6 +90,10 @@ class TestLoadJsonArray:
         p = tmp_path / "missing.json"
         result = load_json_array(p, missing="empty")
         assert result == []
+
+    def test_missing_empty_does_not_mask_directory(self, tmp_path: Path) -> None:
+        with pytest.raises(JsonStoreError):
+            load_json_array(tmp_path, missing="empty")
 
     def test_empty_file_empty_returns_empty(self, tmp_path: Path) -> None:
         p = tmp_path / "f.json"

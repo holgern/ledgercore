@@ -1,5 +1,7 @@
 """ledgercore: generic ledger and storage primitives."""
 
+from ledgercore._version import __version__
+
 from ledgercore.atomic import atomic_create_text, atomic_write_text
 from ledgercore.errors import (
     AtomicWriteError,
@@ -100,7 +102,7 @@ from ledgercore.time import Timespec, TimezoneStyle, utc_now_iso
 from ledgercore.yamlio import load_yaml_object, write_yaml
 
 __all__ = [
-    "atomic_create_text",
+    "__version__",
     "atomic_write_text",
     "AtomicWriteError",
     "FrontMatterError",

@@ -179,6 +179,18 @@ _BOOLISH_STRINGS = {
     "off",
 }
 
+# YAML scalar tokens that some loaders coerce to None.
+_NULLISH_STRINGS = {"null", "none", "~"}
+
+# Conservative safe plain scalar: alphanumeric lead character followed by a
+# restricted middle set. This intentionally excludes YAML plain-scalar
+# hazards (indicator lead characters, colons, hashes, quotes, brackets,
+# braces, and other reserved indicators) so that any string outside this
+# set is quoted. Quoting more than strictly necessary is deterministic and
+# safe; the goal of the minimal renderer is round-trip fidelity, not the
+# shortest possible representation.
+_SAFE_PLAIN_SCALAR_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _./-]*$")
+
 
 def _quote_minimal_string(value: str) -> str:
     escaped = value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
@@ -210,9 +222,19 @@ def _render_minimal_scalar(
         if empty_string_style == "double":
             return '""'
         raise ValueError(f"Unsupported empty string style: {empty_string_style}")
-    boolish = value.casefold() in _BOOLISH_STRINGS
-    special = value != value.strip() or any(char in value for char in ':#[]{}\n"\\')
-    if (quote_boolish_strings and boolish) or (quote_special_strings and special):
+    folded = value.casefold()
+    boolish = folded in _BOOLISH_STRINGS
+    nullish = folded in _NULLISH_STRINGS
+    special = (
+        value != value.strip()
+        or any(char in value for char in ":#[]{}\n\"\\")
+        or _SAFE_PLAIN_SCALAR_RE.fullmatch(value) is None
+    )
+    if (
+        (quote_boolish_strings and boolish)
+        or nullish
+        or (quote_special_strings and special)
+    ):
         return _quote_minimal_string(value)
     return value
 

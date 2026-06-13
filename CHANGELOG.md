@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-06-13
 
 ### Added
 
@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Line-aware JSONL loading and recoverable keyed object-map loading.
 - Configurable timestamp precision and UTC suffix style.
 - Front matter parser option passthrough for document fingerprints.
+- `ledgercore.__version__` exposed at runtime via a build-generated, gitignored
+  `ledgercore/_version.py` (hatch-vcs build hook).
 
 ### Changed
 
@@ -24,7 +26,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `scalar_style="minimal"` now performs deterministic minimal rendering.
 - Aware injected timestamps are normalized to UTC; naive values are rejected.
 
-## [0.1.0] - Unreleased
+### Fixed
+
+- Error subclasses now expose their documented stable `code` attributes
+  (`STORAGE_ERROR`, `ATOMIC_WRITE_ERROR`, `FRONTMATTER_ERROR`,
+  `JSON_STORE_ERROR`, `YAML_STORE_ERROR`, `PATH_VALIDATION_ERROR`,
+  `ID_FORMAT_ERROR`) instead of inheriting the base code.
+- Minimal front matter rendering now quotes YAML plain-scalar hazards so values
+  such as `- item`, `*alias`, `~`, or `2026-06-13` round-trip instead of
+  emitting invalid YAML or changing type.
+- JSON and YAML loaders with `missing="empty"` no longer mask non-missing
+  I/O errors such as reading a directory; only absent files return empty.
+- `LedgerIdFormat` and `NumericIdFormat` consistently reject zero, negative,
+  and boolean IDs across format, parse, and validity checks.
+- `atomic_create_text()` now loops `os.write()` to complete writes even when
+  the OS performs a partial write.
+
+## [0.1.0] - 2026-06-12
 
 ### Added
 

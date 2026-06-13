@@ -7,20 +7,19 @@ section: cross_cutting_concepts
 title: Cross-cutting Concepts
 order: 80
 status: accepted
-date: "2026-06-13"
+date: '2026-06-13'
 body_format: markdown
-created_at: "2026-06-13T08:41:40.792531+00:00"
-updated_at: "2026-06-13T08:56:00.859424+00:00"
+created_at: '2026-06-13T08:41:40.792531+00:00'
+updated_at: '2026-06-13T11:05:13.575504+00:00'
 source_refs:
-  - path: ledgercore/paths.py
-    reason: Cross-cutting path validation and confinement
+- path: ledgercore/paths.py
+  reason: Cross-cutting path validation and confinement
 ---
-
 # 8. Cross-cutting Concepts
 
 ## Errors
 
-Package failures derive from `LedgerCoreError`. Storage failures derive from `StorageError`; specialized categories identify atomic, front matter, JSON, YAML, path, and ID failures. Downstream applications render them at their own boundary.
+Package failures derive from `LedgerCoreError`. Storage failures derive from `StorageError`; specialized categories identify atomic, front matter, JSON, YAML, path, and ID failures. Each exception class exposes a stable `code` class attribute (`LEDGERCORE_ERROR`, `STORAGE_ERROR`, `ATOMIC_WRITE_ERROR`, `FRONTMATTER_ERROR`, `JSON_STORE_ERROR`, `YAML_STORE_ERROR`, `PATH_VALIDATION_ERROR`, `ID_FORMAT_ERROR`) for programmatic handling. Downstream applications render them at their own boundary.
 
 ## Determinism
 
@@ -34,7 +33,7 @@ Package failures derive from `LedgerCoreError`. Storage failures derive from `St
 
 ## Integrity and durability
 
-Atomic output is default for structured writers. Temp files live beside targets. Optional fsync covers contents and the parent directory. This prevents partial ordinary replacement but provides no rollback, locking, or multi-file transaction.
+Atomic output is default for structured writers. Temp files live beside targets. Optional fsync covers contents and the parent directory. This prevents partial ordinary replacement but provides no rollback, locking, or multi-file transaction. Race-safe creation loops `os.write()` to completion so partial writes cannot truncate a file.
 
 ## Path safety
 
@@ -42,15 +41,15 @@ Strict POSIX-relative validation rejects absolute paths, backslashes, empty segm
 
 ## Serialization
 
-YAML/object APIs and front matter accept mapping roots. JSON has separate object and array APIs. Missing and empty policies are explicit. Safe YAML loaders avoid arbitrary object construction. Timestamp strings and template placeholders have opt-in compatibility handling.
+YAML/object APIs and front matter accept mapping roots. JSON has separate object and array APIs. The `missing="empty"` policy returns an empty container only for absent files; an existing-but-unreadable path (such as a directory or a permission error) raises the store error instead of being masked. Safe YAML loaders avoid arbitrary object construction. The minimal front matter renderer quotes any string that is not a conservative safe plain scalar, or that folds to a YAML boolean or null token, so values such as `- item`, `*alias`, `~`, or `2026-06-13` round-trip without producing invalid YAML. Timestamp strings and template placeholders have opt-in compatibility handling.
 
 ## Identity
 
-Numbers are positive and normally padded to four digits. Generic IDs support separators and segments. Cross-ledger refs use `ledger:kind-number` canonically and accept selected aliases. Scan-based next-ID allocation is deterministic but not concurrency-safe.
+Numbers are positive and normally padded to four digits. Formatting, parsing, and validity checks consistently reject zero, negative, and boolean values. Generic IDs support separators and segments. Cross-ledger refs use `ledger:kind-number` canonically and accept selected aliases. Scan-based next-ID allocation is deterministic but not concurrency-safe.
 
 ## Time
 
-`utc_now_iso` emits second-precision strings ending in `Z`. An injected datetime is formatted directly; callers needing actual UTC conversion must normalize it first.
+`utc_now_iso` emits second-precision strings ending in `Z`. Aware injected datetimes are normalized to UTC before formatting; naive values are rejected.
 
 ## Evolution and testing
 

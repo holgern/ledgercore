@@ -31,9 +31,11 @@ def load_yaml_object(
     """
     try:
         text = path.read_text(encoding="utf-8")
-    except OSError as exc:
+    except FileNotFoundError as exc:
         if missing == "empty":
             return {}
+        raise YamlStoreError(f"Cannot read {label}: {exc}") from exc
+    except OSError as exc:
         raise YamlStoreError(f"Cannot read {label}: {exc}") from exc
 
     if not text.strip():

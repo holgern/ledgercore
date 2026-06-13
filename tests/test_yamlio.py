@@ -52,6 +52,10 @@ class TestLoadYamlObject:
         result = load_yaml_object(p, missing="empty")
         assert result == {}
 
+    def test_missing_empty_does_not_mask_directory(self, tmp_path: Path) -> None:
+        with pytest.raises(YamlStoreError):
+            load_yaml_object(tmp_path, missing="empty")
+
     def test_empty_file_error(self, tmp_path: Path) -> None:
         p = tmp_path / "f.yaml"
         p.write_text("", encoding="utf-8")

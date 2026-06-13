@@ -7,15 +7,14 @@ section: architecture_constraints
 title: Architecture Constraints
 order: 20
 status: accepted
-date: "2026-06-13"
+date: '2026-06-13'
 body_format: markdown
-created_at: "2026-06-13T08:41:40.792531+00:00"
-updated_at: "2026-06-13T08:55:57.811704+00:00"
+created_at: '2026-06-13T08:41:40.792531+00:00'
+updated_at: '2026-06-13T11:05:13.161616+00:00'
 source_refs:
-  - path: pyproject.toml
-    reason: Runtime, packaging, typing, and toolchain constraints
+- path: pyproject.toml
+  reason: Runtime, packaging, typing, and toolchain constraints
 ---
-
 # 2. Architecture Constraints
 
 | Constraint                            | Architectural consequence                                                             |
@@ -30,8 +29,8 @@ source_refs:
 
 ## Product constraints
 
-- The package is pre-1.0 (`0.1.0`), with an intent to keep the 0.1.x public API stable where practical.
-- The top-level package re-exports a curated convenience API.
+- The package is pre-1.0 (`0.2.0`), with an intent to keep the 0.2.x public API stable where practical.
+- The top-level package re-exports a curated convenience API, including `__version__`.
 - Existing compatibility aliases and documented legacy reference syntax are retained.
 - Persisted formats must stay inspectable with ordinary text tools.
 
@@ -39,8 +38,8 @@ source_refs:
 
 - Tests use pytest and mirror modules by concern.
 - Ruff and strict mypy define static quality expectations.
-- GitHub Actions covers tests, pre-commit, coverage, and publishing.
-- Releases are wheels and source distributions built with Hatchling.
+- GitHub Actions runs tests, pre-commit checks, coverage, and publishing workflows.
+- Releases are wheels and source distributions built with Hatchling; versions come from Git tags via hatch-vcs and are written to a gitignored `ledgercore/_version.py`.
 
 ## Filesystem assumptions
 

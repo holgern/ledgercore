@@ -54,9 +54,11 @@ class LedgerIdFormat:
         simple = self._build_simple_pattern()
         m = simple.fullmatch(value)
         if m:
+            number = int(m.group("number"))
+            _validate_number(number)
             return LedgerIdParts(
                 prefix=self.prefix,
-                number=int(m.group("number")),
+                number=number,
                 segment=None,
             )
         # If segment support is enabled, try segmented pattern
@@ -64,9 +66,11 @@ class LedgerIdFormat:
             seg = self._build_segmented_pattern()
             m = seg.fullmatch(value)
             if m:
+                number = int(m.group("number"))
+                _validate_number(number)
                 return LedgerIdParts(
                     prefix=self.prefix,
-                    number=int(m.group("number")),
+                    number=number,
                     segment=m.group("segment"),
                 )
         raise ValueError(
@@ -138,6 +142,7 @@ class NumericIdFormat:
 
     def format(self, number: int) -> str:
         """Format a number as a prefixed, zero-padded ID string."""
+        _validate_number(number)
         return f"{self.prefix}{self.separator}{number:0{self.width}d}"
 
     def parse(self, value: str) -> int:
@@ -148,7 +153,9 @@ class NumericIdFormat:
         num_str = value[len(expected_prefix) :]
         if not num_str.isdigit():
             raise ValueError(f"Numeric part of ID '{value}' is not a valid number")
-        return int(num_str)
+        number = int(num_str)
+        _validate_number(number)
+        return number
 
     def next(self, existing_ids: Iterable[str]) -> str:
         """Return the next ID not present in existing_ids."""

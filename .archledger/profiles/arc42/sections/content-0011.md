@@ -7,15 +7,14 @@ section: risks_and_technical_debt
 title: Risks and Technical Debt
 order: 110
 status: accepted
-date: "2026-06-13"
+date: '2026-06-13'
 body_format: markdown
-created_at: "2026-06-13T08:41:40.792531+00:00"
-updated_at: "2026-06-13T08:56:02.409088+00:00"
+created_at: '2026-06-13T08:41:40.792531+00:00'
+updated_at: '2026-06-13T11:05:13.954040+00:00'
 source_refs:
-  - path: ledgercore/time.py
-    reason: Known timestamp semantic limitation
+- path: ledgercore/time.py
+  reason: Known timestamp semantic limitation
 ---
-
 # 11. Risks and Technical Debt
 
 | Risk / debt                                         | Impact                                                  | Mitigation                                                                      |
@@ -24,9 +23,8 @@ source_refs:
 | Filesystem-dependent atomicity/fsync                | Crash behavior varies on unusual or network filesystems | Colocate temp files and test target environments                                |
 | Symlink changes after path validation               | Hostile writable trees can defeat confinement           | Treat base trees as trusted; consider descriptor-relative APIs for hardened use |
 | Whole-file processing                               | Memory and latency scale with size                      | Restrict use to ledger-scale artifacts                                          |
-| YAML implicit typing                                | Scalar interpretation can surprise                      | Safe loading, timestamp-string option, and downstream schemas                   |
-| Injected non-UTC datetime receives a `Z` suffix     | Timestamp can be semantically incorrect                 | Normalize before calling; consider a versioned fix                              |
-| Error code declarations may drift from docs         | Consumers may see inconsistent codes                    | Add subclass code tests before promising code-level stability                   |
+| YAML implicit typing                                | Scalar interpretation can surprise                      | Safe loading, timestamp-string option, minimal quoting, and downstream schemas  |
+| Error code declarations may drift from docs         | Consumers may see inconsistent codes                    | Subclass code attributes are covered by tests before promising code stability   |
 | Package facade may drift from module APIs           | Imports/docs can lag                                    | Review `__all__`, docs, and tests together                                      |
 | Permissive reference aliases                        | Ambiguity pressure grows with kind formats              | Prefer canonical form and apply allowlists                                      |
 | Informal pre-1.0 compatibility                      | Upgrades may break consumers                            | Define deprecation/version policy before 1.0                                    |

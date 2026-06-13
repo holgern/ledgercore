@@ -55,9 +55,11 @@ def load_json_object(
     """
     try:
         text = path.read_text(encoding="utf-8")
-    except OSError as exc:
+    except FileNotFoundError as exc:
         if missing == "empty":
             return {}
+        raise JsonStoreError(f"Cannot read {label}: {exc}") from exc
+    except OSError as exc:
         raise JsonStoreError(f"Cannot read {label}: {exc}") from exc
 
     if not text.strip():
@@ -97,9 +99,11 @@ def load_json_array(
     """
     try:
         text = path.read_text(encoding="utf-8")
-    except OSError as exc:
+    except FileNotFoundError as exc:
         if missing == "empty":
             return []
+        raise JsonStoreError(f"Cannot read {label}: {exc}") from exc
+    except OSError as exc:
         raise JsonStoreError(f"Cannot read {label}: {exc}") from exc
 
     if not text.strip():

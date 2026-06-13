@@ -101,7 +101,14 @@ def atomic_create_text(
 
     try:
         encoded = contents.encode("utf-8")
-        os.write(fd, encoded)
+        # os.write may write fewer bytes than requested. Loop until the whole
+        # buffer is consumed so partial writes cannot leave a truncated file.
+        view = memoryview(encoded)
+        while view:
+            written = os.write(fd, view)
+            if written == 0:
+                raise OSError("short write")
+            view = view[written:]
         if do_fsync:
             os.fsync(fd)
     except OSError as exc:

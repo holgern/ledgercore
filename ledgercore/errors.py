@@ -15,26 +15,40 @@ class LedgerCoreError(Exception):
 class StorageError(LedgerCoreError):
     """Base exception for storage-related errors."""
 
+    code: str = "STORAGE_ERROR"
+
 
 class AtomicWriteError(StorageError):
     """Raised when an atomic write operation fails."""
+
+    code: str = "ATOMIC_WRITE_ERROR"
 
 
 class FrontMatterError(StorageError):
     """Raised when front matter parsing or writing fails."""
 
+    code: str = "FRONTMATTER_ERROR"
+
 
 class JsonStoreError(StorageError):
     """Raised when a JSON store operation fails."""
+
+    code: str = "JSON_STORE_ERROR"
 
 
 class YamlStoreError(StorageError):
     """Raised when a YAML store operation fails."""
 
+    code: str = "YAML_STORE_ERROR"
+
 
 class PathValidationError(StorageError):
     """Raised when a path fails validation."""
 
+    code: str = "PATH_VALIDATION_ERROR"
+
 
 class IdFormatError(LedgerCoreError):
     """Raised when an ID does not match the expected format."""
+
+    code: str = "ID_FORMAT_ERROR"
