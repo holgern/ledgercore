@@ -57,6 +57,41 @@ metadata, body = read_front_matter_document(Path("records/task-0001.md"))
 The YAML block must be a mapping. `metadata` is always a `dict`. `body`
 includes everything after the closing `---` delimiter.
 
+For content already held in memory:
+
+```python
+from ledgercore.frontmatter import (
+    render_front_matter_text,
+    split_front_matter_text,
+    update_front_matter_text,
+)
+
+metadata, body = split_front_matter_text(text, missing="empty")
+text = update_front_matter_text(text, {"status": "ready"})
+text = render_front_matter_text(metadata, body, key_order=("id", "status"))
+```
+
+Parsing can preserve YAML timestamps as strings and quote template
+placeholders. Rendering supports caller-defined key order and body modes.
+
+For deterministic front matter without PyYAML's formatting choices:
+
+```python
+text = render_front_matter_text(
+    {"title": "Example", "tags": ["one", "two"], "empty": ""},
+    "# Body\n",
+    scalar_style="minimal",
+    sequence_indent="  ",
+    empty_string_style="double",
+    remaining_key_order="sorted",
+)
+```
+
+The default `scalar_style="pyyaml"` preserves existing output. Minimal mode
+supports strings, booleans, integers, nulls, and flat scalar sequences.
+Use `quote_template_placeholders="anywhere"` to parse placeholders embedded
+in simple unquoted scalar values.
+
 ### Writing
 
 ```python
@@ -90,21 +125,40 @@ Both return sorted `list[Path]`.
 
 ```python
 from pathlib import Path
-from ledgercore.jsonio import load_json_object, load_json_array, write_json
+from ledgercore.jsonio import dumps_json, load_json_object, write_json
 
 path = Path("state.json")
 write_json(path, {"next": 4})
 state = load_json_object(path, missing="empty")
+compact = dumps_json(state, compact=True)
 ```
 
 - `load_json_object` validates that the root is a JSON object.
 - `load_json_array` validates that the root is a JSON array.
 - `write_json` produces deterministic output: indent 2, sorted keys, final newline.
+- `dumps_json` and `write_json` can change indentation, key sorting, ASCII
+  escaping, compact separators, and final-newline behavior.
 - All operations raise `JsonStoreError` on failure.
 
 Both loaders accept `missing="empty"` to return an empty container when the file
 does not exist, and `empty="empty"` (the default) to return an empty container
 when the file is blank.
+
+## JSONL store
+
+```python
+from pathlib import Path
+from ledgercore.jsonl import load_jsonl_object_map, write_jsonl_objects
+
+path = Path("records.jsonl")
+write_jsonl_objects(path, [{"id": 1}, {"id": 2}])
+result = load_jsonl_object_map(path, key="id", missing="empty")
+```
+
+`load_jsonl_object_rows` retains each valid object's source line.
+`load_jsonl_object_map` indexes rows by a selected field and reports missing,
+invalid, and duplicate keys in `issues`. Duplicate policy can be `"last"`,
+`"first"`, or `"error"`. Writes remain compact and deterministic.
 
 ## YAML store
 
@@ -161,3 +215,17 @@ if locator is not None:
 
 `resolve_config_relative_path` resolves a path relative to the config file's
 parent directory, applying the same safety checks.
+
+For arbitrary resolved paths, use `ensure_inside_base` before access and
+`relative_to_base` when storing a POSIX relative path. `resolve_under_base`
+combines strict relative validation with containment and optional existence
+checking.
+
+`normalize_path_text` is intentionally separate. It can normalize Unicode
+punctuation, backslashes, whitespace, and casing for matching, but its output
+must still pass the strict path helpers before filesystem use.
+
+The default punctuation profile preserves existing behavior. Use
+`punctuation_profile="wide"` for additional quote, prime, dash, and minus
+variants, `"none"` to disable named translations, or
+`punctuation_translation` to add application-specific matching substitutions.

@@ -3,10 +3,36 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
 from ledgercore.errors import JsonStoreError
+
+
+def canonical_json(payload: Mapping[str, object]) -> str:
+    """Return compact, deterministic JSON suitable for hashing."""
+    return dumps_json(payload, compact=True, final_newline=False)
+
+
+def dumps_json(
+    payload: object,
+    *,
+    indent: int | None = 2,
+    sort_keys: bool = True,
+    ensure_ascii: bool = False,
+    final_newline: bool = True,
+    compact: bool = False,
+) -> str:
+    """Serialize JSON with deterministic, configurable formatting."""
+    text = json.dumps(
+        payload,
+        indent=None if compact else indent,
+        sort_keys=sort_keys,
+        ensure_ascii=ensure_ascii,
+        separators=(",", ":") if compact else None,
+    )
+    return text + ("\n" if final_newline else "")
 
 
 def load_json_object(
@@ -98,9 +124,21 @@ def write_json(
     payload: object,
     *,
     atomic: bool = True,
+    indent: int | None = 2,
+    sort_keys: bool = True,
+    ensure_ascii: bool = False,
+    final_newline: bool = True,
+    compact: bool = False,
 ) -> None:
-    """Write JSON with deterministic pretty output: indent=2, sort_keys, newline."""
-    text = json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    """Write JSON with deterministic, configurable formatting."""
+    text = dumps_json(
+        payload,
+        indent=indent,
+        sort_keys=sort_keys,
+        ensure_ascii=ensure_ascii,
+        final_newline=final_newline,
+        compact=compact,
+    )
     if atomic:
         from ledgercore.atomic import atomic_write_text
 

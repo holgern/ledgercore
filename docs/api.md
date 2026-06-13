@@ -7,9 +7,9 @@ Public API grouped by module.
 Atomic UTF-8 text writes and race-safe file creation.
 
 | Function                                                                                  | Description                                                         |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------- |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `atomic_write_text(path, contents, *, normalize=False, fsync=True, fast_io_env_var=None)` | Write text to a file atomically using a temp file and `os.replace`. |
-| `atomic_create_text(path, contents, *, fsync=True, fast_io_env_var=None)`                 | Create a new file atomically using `O_CREAT                         | O_EXCL`. Fails if target exists. |
+| `atomic_create_text(path, contents, *, fsync=True, fast_io_env_var=None)`                 | Create a new file atomically using exclusive creation flags.        |
 
 ## `ledgercore.errors`
 
@@ -34,7 +34,16 @@ YAML front matter reader/writer and source file iteration.
 
 | Symbol                                                                                    | Description                                                      |
 | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `BodyMode`                                                                                | Literal type: `"preserve"` or `"ensure-single-final-newline"`.   |
+| `MissingFrontMatterMode`                                                                  | Literal type: `"error"` or `"empty"`.                            |
+| `BodyMode`                                                                                | Body preservation and newline normalization policy.              |
+| `ScalarStyle`                                                                             | Literal type: `"pyyaml"` or `"minimal"`.                         |
+| `RemainingKeyOrder`                                                                       | Literal type: `"input"` or `"sorted"`.                           |
+| `EmptyStringStyle`                                                                        | Literal type: `"single"` or `"double"`.                          |
+| `TemplatePlaceholderMode`                                                                 | Boolean-compatible placeholder parsing mode.                     |
+| `FrontMatterRenderOptions`                                                                | Frozen collection of all front matter rendering options.         |
+| `split_front_matter_text(text, *, ...)`                                                   | Parse front matter from in-memory text.                          |
+| `render_front_matter_text(metadata, body="", *, ...)`                                     | Render ordered metadata and body.                                |
+| `update_front_matter_text(text, updates, *, ...)`                                         | Merge metadata updates into in-memory text.                      |
 | `read_front_matter_document(path)`                                                        | Read a YAML front matter document, returning `(metadata, body)`. |
 | `write_front_matter_document(path, metadata, body, *, body_mode="preserve", atomic=True)` | Write a YAML front matter document.                              |
 | `iter_source_files(directory, extensions, *, recursive=True)`                             | Iterate source files matching given extensions in sorted order.  |
@@ -73,11 +82,30 @@ UTF-8 text helpers, newline normalization, content hash, text merging.
 
 Validated JSON object/array loading and deterministic JSON writing.
 
-| Function                                                                           | Description                                                 |
-| ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `load_json_object(path, *, label="JSON document", missing="error", empty="empty")` | Load and validate a JSON object.                            |
-| `load_json_array(path, *, label="JSON document", missing="error", empty="empty")`  | Load and validate a JSON array.                             |
-| `write_json(path, payload, *, atomic=True)`                                        | Write JSON with indent 2, sorted keys, and a final newline. |
+| Function                                                                           | Description                                                |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `load_json_object(path, *, label="JSON document", missing="error", empty="empty")` | Load and validate a JSON object.                           |
+| `load_json_array(path, *, label="JSON document", missing="error", empty="empty")`  | Load and validate a JSON array.                            |
+| `dumps_json(payload, *, ...)`                                                      | Render configurable deterministic JSON text.               |
+| `write_json(path, payload, *, ...)`                                                | Write JSON with configurable indentation and compact mode. |
+| `canonical_json(payload)`                                                          | Render compact sorted-key JSON for hashing.                |
+
+## `ledgercore.jsonl`
+
+Recoverable JSON Lines object loading and deterministic writing.
+
+| Symbol                                     | Description                                                |
+| ------------------------------------------ | ---------------------------------------------------------- |
+| `JsonlLoadIssue`                           | Frozen line issue: `line`, `code`, and `message`.          |
+| `JsonlLoadResult`                          | Valid `rows` plus recoverable `issues`.                    |
+| `JsonlObjectRow`                           | Valid object plus its source line number.                  |
+| `JsonlLoadRowsResult`                      | Line-aware valid rows plus recoverable issues.             |
+| `JsonlObjectMapLoadResult`                 | Object rows keyed by a selected string field plus issues.  |
+| `DuplicateKeyPolicy`                       | Literal type: `"last"`, `"first"`, or `"error"`.           |
+| `load_jsonl_object_rows(path, *, ...)`     | Load object rows while preserving source line numbers.     |
+| `load_jsonl_object_map(path, *, key, ...)` | Load object rows into a keyed map with recoverable issues. |
+| `load_jsonl_objects(path, *, ...)`         | Load object rows while reporting malformed lines.          |
+| `write_jsonl_objects(path, rows, *, ...)`  | Write compact object rows atomically by default.           |
 
 ## `ledgercore.paths`
 
@@ -88,10 +116,33 @@ Safe relative POSIX path validation, config discovery, config-relative resolutio
 | `is_relative_to(path, parent)`                                                          | Check whether path is relative to parent.                           |
 | `validate_relative_posix_path(value, *, field_name="path", allow_trailing_slash=False)` | Validate that a path is a safe relative POSIX path.                 |
 | `resolve_relative_child(base_dir, relative_path, *, field_name="path")`                 | Validate and resolve a relative path under a base directory.        |
+| `ensure_inside_base(base_dir, path, *, field_name="path")`                              | Resolve a path and reject paths outside the base.                   |
+| `relative_to_base(base_dir, path, *, field_name="path")`                                | Return a safe POSIX base-relative path string.                      |
+| `resolve_under_base(base_dir, relative_path, *, ...)`                                   | Resolve a safe relative path with optional existence checking.      |
 | `find_config_upwards(start, filenames)`                                                 | Walk from start upward, returning the first matching file, or None. |
 | `ConfigLocator`                                                                         | Frozen dataclass: `workspace_root`, `config_path`, `source`.        |
 | `locate_config(start, filenames, *, default_filename=None)`                             | Find a config file and return a `ConfigLocator`.                    |
 | `resolve_config_relative_path(config_path, value, *, field_name)`                       | Resolve a relative path relative to the config file's directory.    |
+
+## `ledgercore.path_text`
+
+Human-authored path matching helpers. These functions do not authorize
+filesystem access.
+
+| Symbol                                  | Description                                                    |
+| --------------------------------------- | -------------------------------------------------------------- |
+| `PunctuationProfile`                    | Literal type: `"basic"`, `"wide"`, or `"none"`.                |
+| `decode_unicode_escape_literals(value)` | Decode literal `\uXXXX` and `\UXXXXXXXX` sequences only.       |
+| `normalize_path_text(value, *, ...)`    | Normalize Unicode, punctuation, slashes, whitespace, and case. |
+
+## `ledgercore.hashing`
+
+| Symbol                                   | Description                                              |
+| ---------------------------------------- | -------------------------------------------------------- |
+| `TextFingerprint`                        | Full, body, and canonical metadata SHA-256 values.       |
+| `sha256_text(text)`                      | Hash UTF-8 text.                                         |
+| `sha256_bytes(data)`                     | Hash bytes directly.                                     |
+| `front_matter_fingerprint(text, *, ...)` | Fingerprint components with front matter parser options. |
 
 ## `ledgercore.refs`
 
@@ -110,11 +161,13 @@ Canonical cross-ledger resource references.
 
 ## `ledgercore.time`
 
-UTC timestamp generation with second precision.
+UTC timestamp generation with configurable precision and suffix style.
 
-| Function        | Description                       |
-| --------------- | --------------------------------- |
-| `utc_now_iso()` | Returns `"YYYY-MM-DDTHH:MM:SSZ"`. |
+| Symbol          | Description                                                  |
+| --------------- | ------------------------------------------------------------ |
+| `Timespec`      | Supported `datetime.isoformat()` precision values.           |
+| `TimezoneStyle` | Literal type: `"z"` or `"offset"`.                           |
+| `utc_now_iso()` | Normalize an aware datetime to UTC and render ISO-8601 text. |
 
 ## `ledgercore.yamlio`
 

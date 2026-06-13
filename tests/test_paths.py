@@ -8,13 +8,40 @@ import pytest
 
 from ledgercore.errors import PathValidationError
 from ledgercore.paths import (
+    ensure_inside_base,
     find_config_upwards,
     is_relative_to,
     locate_config,
+    relative_to_base,
     resolve_config_relative_path,
     resolve_relative_child,
+    resolve_under_base,
     validate_relative_posix_path,
 )
+
+
+class TestBaseRelativeHelpers:
+    def test_inside_and_same_are_accepted(self, tmp_path: Path) -> None:
+        assert ensure_inside_base(tmp_path, tmp_path) == tmp_path.resolve()
+        assert (
+            ensure_inside_base(tmp_path, tmp_path / "child")
+            == (tmp_path / "child").resolve()
+        )
+
+    def test_outside_is_rejected(self, tmp_path: Path) -> None:
+        with pytest.raises(PathValidationError, match="escapes"):
+            ensure_inside_base(tmp_path / "base", tmp_path / "sibling")
+
+    def test_relative_uses_posix_text(self, tmp_path: Path) -> None:
+        assert relative_to_base(tmp_path, tmp_path / "a" / "b") == "a/b"
+
+    def test_resolve_under_base_checks_existence(self, tmp_path: Path) -> None:
+        with pytest.raises(PathValidationError, match="does not exist"):
+            resolve_under_base(tmp_path, "missing", allow_missing=False)
+
+    def test_resolve_under_base_rejects_escape(self, tmp_path: Path) -> None:
+        with pytest.raises(PathValidationError):
+            resolve_under_base(tmp_path, "../escape")
 
 
 class TestIsRelativeTo:

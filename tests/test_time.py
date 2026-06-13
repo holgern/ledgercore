@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from ledgercore.time import utc_now_iso
 
 
@@ -29,5 +31,19 @@ class TestUtcNowIso:
         utc_plus_2 = timezone(timedelta(hours=2))
         injected = datetime(2025, 6, 1, 14, 0, 0, tzinfo=utc_plus_2)
         result = utc_now_iso(now=injected)
-        # strftime uses the datetime's tzinfo, so 14:00+02:00 -> 14:00 in strftime
-        assert result == "2025-06-01T14:00:00Z"
+        assert result == "2025-06-01T12:00:00Z"
+
+    def test_offset_microseconds(self) -> None:
+        now = datetime(2026, 1, 2, 3, 4, 5, 123456, tzinfo=timezone.utc)
+        assert (
+            utc_now_iso(
+                now=now,
+                timespec="microseconds",
+                timezone_style="offset",
+            )
+            == "2026-01-02T03:04:05.123456+00:00"
+        )
+
+    def test_rejects_naive_datetime(self) -> None:
+        with pytest.raises(ValueError, match="timezone-aware"):
+            utc_now_iso(now=datetime(2026, 1, 2, 3, 4, 5))

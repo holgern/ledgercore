@@ -8,7 +8,17 @@ from pathlib import Path
 import pytest
 
 from ledgercore.errors import JsonStoreError
-from ledgercore.jsonio import load_json_array, load_json_object, write_json
+from ledgercore.jsonio import (
+    canonical_json,
+    dumps_json,
+    load_json_array,
+    load_json_object,
+    write_json,
+)
+
+
+def test_canonical_json_is_compact_sorted_and_unicode() -> None:
+    assert canonical_json({"z": 1, "a": "é"}) == '{"a":"é","z":1}'
 
 
 class TestLoadJsonObject:
@@ -91,6 +101,20 @@ class TestLoadJsonArray:
 
 
 class TestWriteJson:
+    def test_dumps_defaults_match_write_contract(self) -> None:
+        assert dumps_json({"b": 1, "a": 2}) == ('{\n  "a": 2,\n  "b": 1\n}\n')
+
+    def test_dumps_can_omit_final_newline(self) -> None:
+        assert (
+            dumps_json({"b": 1, "a": 2}, final_newline=False)
+            == '{\n  "a": 2,\n  "b": 1\n}'
+        )
+
+    def test_write_compact(self, tmp_path: Path) -> None:
+        path = tmp_path / "compact.json"
+        write_json(path, {"b": 1, "a": 2}, compact=True)
+        assert path.read_text(encoding="utf-8") == '{"a":2,"b":1}\n'
+
     def test_writes_deterministic(self, tmp_path: Path) -> None:
         p = tmp_path / "f.json"
         write_json(p, {"b": 2, "a": 1})

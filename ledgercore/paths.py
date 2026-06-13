@@ -74,6 +74,39 @@ def resolve_relative_child(
     return resolved
 
 
+def ensure_inside_base(base_dir: Path, path: Path, *, field_name: str = "path") -> Path:
+    """Resolve path and require it to be inside or equal to base_dir."""
+    base_resolved = base_dir.resolve()
+    resolved = path.resolve()
+    try:
+        resolved.relative_to(base_resolved)
+    except ValueError:
+        raise PathValidationError(
+            f"{field_name} escapes base directory: {path}"
+        ) from None
+    return resolved
+
+
+def relative_to_base(base_dir: Path, path: Path, *, field_name: str = "path") -> str:
+    """Return a safe base-relative path using POSIX separators."""
+    resolved = ensure_inside_base(base_dir, path, field_name=field_name)
+    return resolved.relative_to(base_dir.resolve()).as_posix()
+
+
+def resolve_under_base(
+    base_dir: Path,
+    relative_path: str,
+    *,
+    field_name: str = "path",
+    allow_missing: bool = True,
+) -> Path:
+    """Resolve a validated relative path below base_dir."""
+    resolved = resolve_relative_child(base_dir, relative_path, field_name=field_name)
+    if not allow_missing and not resolved.exists():
+        raise PathValidationError(f"{field_name} does not exist: {relative_path}")
+    return resolved
+
+
 def find_config_upwards(
     start: Path,
     filenames: tuple[str, ...],
