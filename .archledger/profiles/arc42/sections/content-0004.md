@@ -16,8 +16,6 @@ source_refs:
     reason: Core safety and composition strategy
 ---
 
-# 4. Solution Strategy
-
 The architecture is a stateless utility library organized by technical concern. Each module offers a narrow contract and composes lower-level primitives instead of introducing services or framework abstractions.
 
 1. **Filesystem safety by explicit primitives.** Atomic replacement writes a temporary sibling, optionally flushes it, calls `os.replace`, and optionally flushes the parent. Create-only writes use `O_CREAT | O_EXCL`.

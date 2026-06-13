@@ -307,21 +307,30 @@ mypy with `strict = true`.
 ## Development
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,docs]"
 python -m pytest -q
 python -m ruff check .
 python -m mypy ledgercore
+python -m sphinx -W -b html docs docs/_build/html
 ```
 
 ## Release checklist
 
-1. Update version in `pyproject.toml`.
-2. Run `python -m pytest -q`.
-3. Run `python -m ruff check .`.
-4. Run `python -m mypy ledgercore`.
-5. Run `python -m build`.
-6. Run `python -m twine check dist/*`.
-7. Smoke-test the built wheel in a clean virtualenv.
+Versions are derived from VCS tags; there is no static version in
+`pyproject.toml` to update.
+
+1. Update `CHANGELOG.md` and create or sign the target tag, such as `v0.2.0`.
+2. Run the test, coverage, lint, formatting, typing, example, and docs gates in
+   [`docs/release.rst`](docs/release.rst).
+3. Run `python -m build` and `python -m twine check dist/*`.
+4. Verify the wheel and sdist contain `LICENSE` and generated `_version.py`.
+5. Smoke-test the built wheel in a clean virtualenv.
+
+For a supported non-git source archive, provide the intended version:
+
+```bash
+SETUPTOOLS_SCM_PRETEND_VERSION=0.2.0 python -m build
+```
 
 ## Stability
 

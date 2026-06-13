@@ -16,8 +16,6 @@ source_refs:
     reason: Runtime, packaging, typing, and toolchain constraints
 ---
 
-# 2. Architecture Constraints
-
 | Constraint                            | Architectural consequence                                                             |
 | ------------------------------------- | ------------------------------------------------------------------------------------- |
 | Python 3.10 or newer                  | Modern annotations, dataclasses, literals, and `pathlib` are available                |

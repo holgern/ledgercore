@@ -16,8 +16,6 @@ source_refs:
     reason: Representative parsing and writing runtime flow
 ---
 
-# 6. Runtime View
-
 ## Atomic replacement
 
 ```text

@@ -33,11 +33,28 @@ class LedgerIdFormat:
     segment_separator: str | None = None
     segment_required: bool = False
 
+    def __post_init__(self) -> None:
+        _validate_format_parts(
+            prefix=self.prefix,
+            separator=self.separator,
+            width=self.width,
+        )
+        if self.segment_separator == "":
+            raise ValueError("Segment separator must not be empty")
+        if self.segment_required and self.segment_separator is None:
+            raise ValueError("segment_required needs a segment_separator")
+
     def format(self, number: int, *, segment: str | None = None) -> str:
         """Format a number (and optional segment) as an ID string."""
         _validate_number(number)
+        if self.segment_required and segment is None:
+            raise ValueError("Segment is required")
         padded = f"{number:0{self.width}d}"
         if segment is not None:
+            if self.segment_separator is None:
+                raise ValueError("Segment formatting is not enabled")
+            if not re.fullmatch(r"[a-zA-Z0-9_-]+", segment):
+                raise ValueError("Segment must contain letters, digits, '_' or '-'")
             seg_sep = (
                 self.segment_separator if self.segment_separator else self.separator
             )
@@ -54,6 +71,8 @@ class LedgerIdFormat:
         simple = self._build_simple_pattern()
         m = simple.fullmatch(value)
         if m:
+            if self.segment_required:
+                raise ValueError(f"ID '{value}' requires a segment")
             number = int(m.group("number"))
             _validate_number(number)
             return LedgerIdParts(
@@ -140,6 +159,13 @@ class NumericIdFormat:
     separator: str = "-"
     width: int = 4
 
+    def __post_init__(self) -> None:
+        _validate_format_parts(
+            prefix=self.prefix,
+            separator=self.separator,
+            width=self.width,
+        )
+
     def format(self, number: int) -> str:
         """Format a number as a prefixed, zero-padded ID string."""
         _validate_number(number)
@@ -178,6 +204,15 @@ def _validate_number(number: int) -> None:
         raise ValueError("Number must not be a boolean")
     if number <= 0:
         raise ValueError(f"Number must be positive, got {number}")
+
+
+def _validate_format_parts(*, prefix: str, separator: str, width: int) -> None:
+    if not prefix:
+        raise ValueError("Prefix must not be empty")
+    if not separator:
+        raise ValueError("Separator must not be empty")
+    if width <= 0:
+        raise ValueError("Width must be positive")
 
 
 def parse_prefixed_number(

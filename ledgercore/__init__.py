@@ -1,6 +1,11 @@
 """ledgercore: generic ledger and storage primitives."""
 
-from ledgercore._version import __version__
+try:
+    from ledgercore._version import __version__
+except ModuleNotFoundError as exc:
+    if exc.name != "ledgercore._version":
+        raise
+    __version__ = "0.0.0+unknown"
 
 from ledgercore.atomic import atomic_create_text, atomic_write_text
 from ledgercore.errors import (
@@ -103,6 +108,7 @@ from ledgercore.yamlio import load_yaml_object, write_yaml
 
 __all__ = [
     "__version__",
+    "atomic_create_text",
     "atomic_write_text",
     "AtomicWriteError",
     "FrontMatterError",

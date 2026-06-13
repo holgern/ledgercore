@@ -16,8 +16,6 @@ source_refs:
     reason: Known timestamp semantic limitation
 ---
 
-# 11. Risks and Technical Debt
-
 | Risk / debt                                         | Impact                                                  | Mitigation                                                                      |
 | --------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | No inter-process lock or transactional ID allocator | Concurrent scans can choose the same ID                 | Pair with exclusive create and retry downstream                                 |

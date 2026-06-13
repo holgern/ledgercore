@@ -17,7 +17,9 @@ Use ``atomic_write_text`` when replacing a file is expected:
    atomic_write_text(Path("index.json"), "{}\n")
 
 The write goes to a temporary file first, then ``os.replace`` atomically moves it
-to the target. Parent directories are created automatically.
+to the target. Parent directories are created automatically. Replacing an
+existing file preserves its permission bits; a newly created file keeps the
+private ``0600`` mode created by ``mkstemp``.
 
 Use ``atomic_create_text`` when an existing file must not be overwritten:
 
@@ -77,6 +79,8 @@ For content already held in memory:
 
 Parsing can preserve YAML timestamps as strings and quote template
 placeholders. Rendering supports caller-defined key order and body modes.
+Minimal scalar rendering accepts only simple alphanumeric, underscore, and
+hyphen metadata keys and raises ``FrontMatterError`` for unsafe YAML keys.
 
 For deterministic front matter without PyYAML's formatting choices:
 

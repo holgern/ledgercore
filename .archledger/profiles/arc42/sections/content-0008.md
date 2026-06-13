@@ -16,8 +16,6 @@ source_refs:
     reason: Cross-cutting path validation and confinement
 ---
 
-# 8. Cross-cutting Concepts
-
 ## Errors
 
 Package failures derive from `LedgerCoreError`. Storage failures derive from `StorageError`; specialized categories identify atomic, front matter, JSON, YAML, path, and ID failures. Each exception class exposes a stable `code` class attribute (`LEDGERCORE_ERROR`, `STORAGE_ERROR`, `ATOMIC_WRITE_ERROR`, `FRONTMATTER_ERROR`, `JSON_STORE_ERROR`, `YAML_STORE_ERROR`, `PATH_VALIDATION_ERROR`, `ID_FORMAT_ERROR`) for programmatic handling. Downstream applications render them at their own boundary.

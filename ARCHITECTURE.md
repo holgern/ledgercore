@@ -11,8 +11,6 @@ Generated from archledger records. Do not edit this generated file directly.
 
 # Introduction and Goals
 
-# 1. Introduction and Goals
-
 ## Purpose
 
 `ledgercore` is a small, typed Python library that supplies reusable storage and reference primitives for file-backed ledger applications. It centralizes low-level behavior shared by task, architecture, specification, and similar tools without defining a domain-specific record model.
@@ -56,19 +54,11 @@ The library is embedded by a downstream Python application. It has no CLI, serve
 
 ## Requirements Overview
 
-<!-- archledger: no accepted records for this section yet -->
-
 ## Quality Goals
-
-<!-- archledger: no accepted records for this section yet -->
 
 ## Stakeholders
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Architecture Constraints
-
-# 2. Architecture Constraints
 
 | Constraint                            | Architectural consequence                                                             |
 | ------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -100,11 +90,7 @@ The library is embedded by a downstream Python application. It has no CLI, serve
 - `fsync` improves crash durability but cannot guarantee every device or filesystem.
 - Path confinement observes symlink resolution at validation time; downstream code must account for time-of-check/time-of-use races in hostile writable trees.
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Context and Scope
-
-# 3. Context and Scope
 
 ```text
 Developer / operator
@@ -154,15 +140,9 @@ The downstream application owns all persisted data. `ledgercore` keeps no catalo
 
 ## Business Context
 
-<!-- archledger: no accepted records for this section yet -->
-
 ## Technical Context
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Solution Strategy
-
-# 4. Solution Strategy
 
 The architecture is a stateless utility library organized by technical concern. Each module offers a narrow contract and composes lower-level primitives instead of introducing services or framework abstractions.
 
@@ -184,11 +164,7 @@ The architecture is a stateless utility library organized by technical concern. 
 
 ## Strategy Items
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Building Block View
-
-# 5. Building Block View
 
 ```text
 ledgercore
@@ -226,11 +202,7 @@ ledgercore
 
 Names exported from modules and the curated package `__all__` are intended API. Underscore-prefixed helpers are internal. Front matter compatibility aliases are public legacy surfaces.
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Runtime View
-
-# 6. Runtime View
 
 ## Atomic replacement
 
@@ -276,11 +248,7 @@ The parser tries canonical, legacy underscore, file-safe, and local forms in ord
 
 Valid object rows are retained in order. Invalid JSON and non-object rows become line-numbered issues. File-level read failures raise a store exception.
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Deployment View
-
-# 7. Deployment View
 
 ```text
 Python 3.10+ process
@@ -314,11 +282,7 @@ Project metadata declares Python 3.10 through 3.13. The code is primarily OS-neu
 
 The deployment model fits repository-scale ledgers, not large datasets or high-throughput storage services.
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Cross-cutting Concepts
-
-# 8. Cross-cutting Concepts
 
 ## Errors
 
@@ -358,11 +322,7 @@ Numbers are positive and normally padded to four digits. Formatting, parsing, an
 
 Compatibility uses permissive input and canonical output. Public additions should be exported, documented, typed, and tested. Pytest covers behavior; Ruff and strict mypy cover style and typing.
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Architecture Decisions
-
-# 9. Architecture Decisions
 
 | Decision                                     | Status   | Consequence                                                                             |
 | -------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
@@ -381,11 +341,7 @@ Compatibility uses permissive input and canonical output. Public additions shoul
 
 Decision drivers are source-control friendliness, minimal dependencies, clear downstream ownership, deterministic behavior, and prevention of common filesystem corruption and traversal mistakes. The implementation does not claim database-grade transactions or security in an adversarial filesystem.
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Quality Requirements
-
-# 10. Quality Requirements
 
 ## Quality tree
 
@@ -412,15 +368,9 @@ Most functions are pure transformations or accept explicit paths and policies. T
 
 ## Quality Requirements Overview
 
-<!-- archledger: no accepted records for this section yet -->
-
 ## Quality Scenarios
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Risks and Technical Debt
-
-# 11. Risks and Technical Debt
 
 | Risk / debt                                         | Impact                                                  | Mitigation                                                                      |
 | --------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -440,11 +390,7 @@ Lack of multi-file transactions, indexing, remote access, and domain validation 
 
 ## Risk Overview
 
-<!-- archledger: no accepted records for this section yet -->
-
 # Glossary
-
-# 12. Glossary
 
 | Term                       | Meaning                                                                  |
 | -------------------------- | ------------------------------------------------------------------------ |
@@ -467,5 +413,3 @@ Lack of multi-file transactions, indexing, remote access, and domain validation 
 | Source-first documentation | Canonical architecture fragments from which builds are derived           |
 | Store error                | Package error for malformed structured data or file I/O                  |
 | Whole-file processing      | Reading or constructing a complete artifact in memory                    |
-
-<!-- archledger: no accepted records for this section yet -->

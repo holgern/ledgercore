@@ -16,8 +16,6 @@ source_refs:
     reason: Package module facade and building blocks
 ---
 
-# 5. Building Block View
-
 ```text
 ledgercore
 ├── storage foundation: errors, atomic, io

@@ -141,6 +141,48 @@ class TestLedgerIdFormat:
         fmt = LedgerIdFormat(prefix="run", width=2)
         assert fmt.format(3) == "run-03"
 
+    @pytest.mark.parametrize(
+        ("kwargs", "message"),
+        [
+            ({"prefix": ""}, "Prefix"),
+            ({"prefix": "task", "separator": ""}, "Separator"),
+            ({"prefix": "task", "width": 0}, "Width"),
+            ({"prefix": "task", "segment_separator": ""}, "Segment separator"),
+        ],
+    )
+    def test_rejects_invalid_configuration(
+        self, kwargs: dict[str, object], message: str
+    ) -> None:
+        with pytest.raises(ValueError, match=message):
+            LedgerIdFormat(**kwargs)  # type: ignore[arg-type]
+
+    def test_segment_required_needs_segment_support(self) -> None:
+        with pytest.raises(ValueError, match="segment_separator"):
+            LedgerIdFormat(prefix="task", segment_required=True)
+
+    def test_rejects_empty_segment(self) -> None:
+        fmt = LedgerIdFormat(prefix="al", segment_separator="_")
+        with pytest.raises(ValueError, match="Segment"):
+            fmt.format(1, segment="")
+
+    def test_rejects_segment_when_not_enabled(self) -> None:
+        fmt = LedgerIdFormat(prefix="task")
+        with pytest.raises(ValueError, match="not enabled"):
+            fmt.format(1, segment="content")
+
+    def test_segment_required_applies_to_format_and_parse(self) -> None:
+        fmt = LedgerIdFormat(
+            prefix="al",
+            separator="_",
+            segment_separator="_",
+            segment_required=True,
+        )
+        with pytest.raises(ValueError, match="required"):
+            fmt.format(1)
+        with pytest.raises(ValueError, match="requires a segment"):
+            fmt.parse_parts("al_0001")
+        assert fmt.parse_parts("al_content_0001").segment == "content"
+
 
 class TestNumericIdFormat:
     def test_format_default(self) -> None:
@@ -209,6 +251,18 @@ class TestNumericIdFormat:
         fmt = NumericIdFormat(prefix="task")
         ids = ["task-0001", "task-0003"]
         assert fmt.next(ids) == "task-0004"
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"prefix": ""},
+            {"prefix": "task", "separator": ""},
+            {"prefix": "task", "width": 0},
+        ],
+    )
+    def test_rejects_invalid_configuration(self, kwargs: dict[str, object]) -> None:
+        with pytest.raises(ValueError):
+            NumericIdFormat(**kwargs)  # type: ignore[arg-type]
 
 
 class TestParsePrefixedNumber:

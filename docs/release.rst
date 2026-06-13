@@ -11,13 +11,15 @@ Install build and validation tools:
 
 .. code:: bash
 
-   python -m pip install -e ".[dev,release]"
+   python -m pip install -e ".[dev,docs,release]"
    # or, equivalently:
    python -m pip install -e ".[dev]" && python -m pip install build twine
 
 ``ledgercore`` uses hatch-vcs for versioning. Installing or building the project
 generates a gitignored ``ledgercore/_version.py`` that exposes
 ``ledgercore.__version__``; do not commit that file.
+Direct source-tree imports fall back to ``0.0.0+unknown`` when that generated
+module is absent.
 
 Pre-release checklist
 ---------------------
@@ -40,7 +42,12 @@ Pre-release checklist
 
    python -m mypy ledgercore
 
-4. Ensure the README examples are correct (manually or via doctest).
+4. Ensure formatting and documentation are clean:
+
+.. code:: bash
+
+   python -m ruff format --check .
+   python -m sphinx -W -b html docs docs/_build/html
 
 5. Ensure a ``LICENSE`` file is present and ships in the built artifacts:
 
@@ -57,6 +64,13 @@ Building
 .. code:: bash
 
    python -m build
+
+Builds from a non-git source archive are supported when the intended version is
+provided explicitly:
+
+.. code:: bash
+
+   SETUPTOOLS_SCM_PRETEND_VERSION=0.2.0 python -m build
 
 This produces ``dist/ledgercore-<version>.tar.gz`` and
 ``dist/ledgercore-<version>-py3-none-any.whl``.

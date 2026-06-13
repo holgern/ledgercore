@@ -109,6 +109,11 @@ class TestFrontMatterText:
         with pytest.raises(FrontMatterError, match="nested"):
             render_front_matter_text({"x": {"nested": True}}, scalar_style="minimal")
 
+    @pytest.mark.parametrize("key", ["bad: key", "-item", "line\nbreak"])
+    def test_minimal_style_rejects_unsafe_keys(self, key: str) -> None:
+        with pytest.raises(FrontMatterError, match="safe metadata key"):
+            render_front_matter_text({key: "value"}, scalar_style="minimal")
+
     def test_update_passes_minimal_render_options(self) -> None:
         updated = update_front_matter_text(
             "---\ntitle: Old\n---\n\n# Body\n",

@@ -16,8 +16,6 @@ source_refs:
     reason: Distribution and runtime deployment metadata
 ---
 
-# 7. Deployment View
-
 ```text
 Python 3.10+ process
 ├── downstream ledger application

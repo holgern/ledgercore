@@ -38,9 +38,14 @@ Changelog = "https://github.com/holgern/ledgercore/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 dev = [
     "pytest",
+    "coverage",
     "ruff",
     "mypy",
     "types-PyYAML",
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
 ]
 release = [
     "build",

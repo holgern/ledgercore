@@ -8,7 +8,12 @@ from unittest.mock import patch
 
 import pytest
 
-from ledgercore.atomic import atomic_create_text, atomic_write_text
+from ledgercore.atomic import (
+    _cleanup_tmp,
+    _fsync_dir,
+    atomic_create_text,
+    atomic_write_text,
+)
 from ledgercore.errors import AtomicWriteError
 
 
@@ -28,6 +33,18 @@ class TestAtomicWriteText:
         p.write_text("old", encoding="utf-8")
         atomic_write_text(p, "new")
         assert p.read_text(encoding="utf-8") == "new"
+
+    def test_preserves_existing_mode(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        p.write_text("old", encoding="utf-8")
+        os.chmod(p, 0o640)
+        atomic_write_text(p, "new", fsync=False)
+        assert p.stat().st_mode & 0o777 == 0o640
+
+    def test_new_file_uses_private_mode(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        atomic_write_text(p, "new", fsync=False)
+        assert p.stat().st_mode & 0o777 == 0o600
 
     def test_normalize(self, tmp_path: Path) -> None:
         p = tmp_path / "f.txt"
@@ -69,6 +86,15 @@ class TestAtomicWriteText:
                 atomic_write_text(p, "fail")
         assert exc_info.value.__cause__ is not None
         assert isinstance(exc_info.value.__cause__, OSError)
+
+    def test_chmod_failure_cleans_up_tmp(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        p.write_text("old", encoding="utf-8")
+        with patch("ledgercore.atomic.os.chmod", side_effect=OSError("chmod failed")):
+            with pytest.raises(AtomicWriteError, match="Atomic write failed"):
+                atomic_write_text(p, "fail", fsync=False)
+        assert list(tmp_path.glob(".ledgercore-tmp-*")) == []
+        assert p.read_text(encoding="utf-8") == "old"
 
 
 class TestAtomicCreateText:
@@ -142,3 +168,61 @@ class TestAtomicCreateText:
         with patch("ledgercore.atomic.os.write", side_effect=short_write) as _:
             atomic_create_text(p, content, fsync=False)
         assert p.read_text(encoding="utf-8") == content
+
+    def test_zero_length_write_cleans_up_target(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        with patch("ledgercore.atomic.os.write", return_value=0):
+            with pytest.raises(AtomicWriteError, match="Atomic create failed"):
+                atomic_create_text(p, "content", fsync=False)
+        assert not p.exists()
+
+    def test_write_failure_cleans_up_target(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        with patch("ledgercore.atomic.os.write", side_effect=OSError("write failed")):
+            with pytest.raises(AtomicWriteError, match="Atomic create failed"):
+                atomic_create_text(p, "content", fsync=False)
+        assert not p.exists()
+
+    def test_fsync_failure_cleans_up_target(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        with patch("ledgercore.atomic.os.fsync", side_effect=OSError("fsync failed")):
+            with pytest.raises(AtomicWriteError, match="Atomic create failed"):
+                atomic_create_text(p, "content")
+        assert not p.exists()
+
+    def test_open_failure_is_wrapped(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        with patch("ledgercore.atomic.os.open", side_effect=OSError("open failed")):
+            with pytest.raises(AtomicWriteError, match="Atomic create failed"):
+                atomic_create_text(p, "content")
+
+    def test_close_failure_is_wrapped(self, tmp_path: Path) -> None:
+        p = tmp_path / "f.txt"
+        real_close = os.close
+        calls = 0
+
+        def fail_first_close(fd: int) -> None:
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise OSError("close failed")
+            real_close(fd)
+
+        with patch("ledgercore.atomic.os.close", side_effect=fail_first_close):
+            with pytest.raises(AtomicWriteError, match="Atomic create failed"):
+                atomic_create_text(p, "content", fsync=False)
+
+
+def test_fsync_dir_ignores_open_failure(tmp_path: Path) -> None:
+    with patch("ledgercore.atomic.os.open", side_effect=OSError("open failed")):
+        _fsync_dir(tmp_path)
+
+
+def test_cleanup_tmp_ignores_close_and_unlink_failures(tmp_path: Path) -> None:
+    p = tmp_path / "tmp"
+    p.write_text("content", encoding="utf-8")
+    with (
+        patch("ledgercore.atomic.os.close", side_effect=OSError("close failed")),
+        patch.object(Path, "unlink", side_effect=OSError("unlink failed")),
+    ):
+        _cleanup_tmp(123, p)

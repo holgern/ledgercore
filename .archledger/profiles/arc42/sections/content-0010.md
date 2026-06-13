@@ -16,8 +16,6 @@ source_refs:
     reason: Behavioral quality scenarios and regression coverage
 ---
 
-# 10. Quality Requirements
-
 ## Quality tree
 
 - **Reliability:** atomic visibility, exclusive creation, explicit malformed-data reporting

@@ -16,8 +16,6 @@ source_refs:
     reason: Purpose, goals, public scope, and non-goals
 ---
 
-# 1. Introduction and Goals
-
 ## Purpose
 
 `ledgercore` is a small, typed Python library that supplies reusable storage and reference primitives for file-backed ledger applications. It centralizes low-level behavior shared by task, architecture, specification, and similar tools without defining a domain-specific record model.

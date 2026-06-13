@@ -47,12 +47,20 @@ def atomic_write_text(
     fsync: bool = True,
     fast_io_env_var: str | None = None,
 ) -> None:
-    """Write text to a file atomically using a temp file and os.replace."""
+    """Write text atomically, preserving an existing mode.
+
+    Newly created files retain the private ``0o600`` mode supplied by
+    :func:`tempfile.mkstemp`, filtered by the platform as applicable.
+    """
     if normalize:
         contents = contents.replace("\r\n", "\n").replace("\r", "\n")
 
     path.parent.mkdir(parents=True, exist_ok=True)
     do_fsync = fsync and _should_fsync(fast_io_env_var)
+    try:
+        existing_mode = path.stat().st_mode & 0o7777
+    except FileNotFoundError:
+        existing_mode = None
 
     tmp_fd: int | None = None
     tmp_path: Path | None = None
@@ -68,6 +76,8 @@ def atomic_write_text(
                 f.flush()
                 os.fsync(f.fileno())
         tmp_fd = None  # closed by fdopen context manager
+        if existing_mode is not None:
+            os.chmod(tmp_name, existing_mode)
         os.replace(tmp_name, str(path))
         tmp_path = None
         if do_fsync:

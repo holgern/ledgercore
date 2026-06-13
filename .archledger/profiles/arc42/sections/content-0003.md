@@ -16,8 +16,6 @@ source_refs:
     reason: Public integration boundary
 ---
 
-# 3. Context and Scope
-
 ```text
 Developer / operator
         |

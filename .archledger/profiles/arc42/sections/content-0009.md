@@ -16,8 +16,6 @@ source_refs:
     reason: Documented design boundaries and API intent
 ---
 
-# 9. Architecture Decisions
-
 | Decision                                     | Status   | Consequence                                                                             |
 | -------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
 | Stateless utility library, not a framework   | Accepted | Downstream applications retain orchestration and policy                                 |

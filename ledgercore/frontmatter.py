@@ -36,6 +36,7 @@ class FrontMatterRenderOptions:
 
 
 _FRONT_MATTER_DELIM = "---"
+_SAFE_MINIMAL_KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*$")
 _TEMPLATE_VALUE = re.compile(
     r"^(\s*[^#\n][^:\n]*:\s*)(\{\{[^{}\n]+\}\})(\s*(?:#.*)?)$",
     re.MULTILINE,
@@ -250,6 +251,10 @@ def _render_minimal_yaml(
 ) -> str:
     lines: list[str] = []
     for key in keys:
+        if not _SAFE_MINIMAL_KEY.fullmatch(key):
+            raise FrontMatterError(
+                f"Minimal scalar style requires a safe metadata key, got {key!r}"
+            )
         value = metadata[key]
         if isinstance(value, Mapping):
             raise FrontMatterError(
