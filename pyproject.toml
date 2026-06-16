@@ -30,10 +30,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/holgern/ledgercore"
-Repository = "https://github.com/holgern/ledgercore"
-Issues = "https://github.com/holgern/ledgercore/issues"
-Changelog = "https://github.com/holgern/ledgercore/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/ledgerwerk/ledgercore"
+Repository = "https://github.com/ledgerwerk/ledgercore"
+Issues = "https://github.com/ledgerwerk/ledgerwerk/issues"
+Changelog = "https://github.com/ledgerwerk/ledgercore/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [

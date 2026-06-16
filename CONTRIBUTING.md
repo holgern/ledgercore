@@ -7,7 +7,7 @@ Thank you for your interest in contributing to `ledgercore`.
 Clone the repository and install with dev dependencies:
 
 ```bash
-git clone https://github.com/holgern/ledgercore.git
+git clone https://github.com/ledgerwerk/ledgercore.git
 cd ledgercore
 python -m pip install -e ".[dev]"
 ```

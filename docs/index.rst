@@ -20,7 +20,7 @@ Requirements: Python 3.10+, PyYAML.
 Quick start
 -----------
 
-See the `project README <https://github.com/holgern/ledgercore#readme>`__ for a
+See the `project README <https://github.com/ledgerwerk/ledgercore#readme>`__ for a
 hands-on introduction.
 
 Documentation index
