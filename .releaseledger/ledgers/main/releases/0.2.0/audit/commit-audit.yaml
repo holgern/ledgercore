@@ -1,0 +1,258 @@
+schema_version: 1
+object_type: commit_audit_sheet
+versioning:
+  schema_version: 1
+  revision: 1
+release_version: 0.2.0
+git_base_ref: v0.1.0
+git_base_sha: 3331767af5206ddc4d782f323d877c5602bd6f85
+git_head_ref: v0.2.0
+git_head_sha: 0be2ef0c90d73e3288d5712dbcf3c4c2c88376f8
+git_range: 3331767af5206ddc4d782f323d877c5602bd6f85..0be2ef0c90d73e3288d5712dbcf3c4c2c88376f8
+commit_count: 9
+rows:
+  - sha: 39297c8683f8aa4f398c72e3f913654b9e4709e7
+    source_ref: git:39297c8683f8aa4f398c72e3f913654b9e4709e7
+    short_sha: 39297c8
+    changed_paths:
+      - ledgercore/io.py
+    stats:
+      files_changed: 0
+      insertions: 1
+      deletions: 1
+    inspected: true
+    inspected_paths:
+      - ledgercore/io.py
+    observed_behavior: "Fixed Windows path write by using write_bytes instead of write_text to avoid encoding issues"
+    public_impact: public
+    decision: accepted
+    evidence_subject: "fix: windows path write"
+  - sha: 528de47eb8bd03612865717a12173ba5249ead7e
+    source_ref: git:528de47eb8bd03612865717a12173ba5249ead7e
+    short_sha: 528de47
+    changed_paths:
+      - .taskledger.toml
+      - README.md
+      - docs/api.md
+      - docs/storage.md
+      - ledgercore/__init__.py
+      - ledgercore/frontmatter.py
+      - ledgercore/hashing.py
+      - ledgercore/jsonio.py
+      - ledgercore/jsonl.py
+      - ledgercore/path_text.py
+      - ledgercore/paths.py
+      - tests/test_frontmatter.py
+      - tests/test_hashing.py
+      - tests/test_jsonio.py
+      - tests/test_jsonl.py
+      - tests/test_path_text.py
+      - tests/test_paths.py
+    stats:
+      files_changed: 0
+      insertions: 770
+      deletions: 74
+    inspected: true
+    inspected_paths:
+      - ledgercore/jsonl.py
+      - ledgercore/hashing.py
+      - ledgercore/path_text.py
+      - ledgercore/frontmatter.py
+      - ledgercore/paths.py
+    observed_behavior: "Added JSONL object storage with deterministic writing and recoverable line loading, SHA-256 content fingerprinting with front matter decomposition, and path text normalization for Unicode and punctuation"
+    public_impact: public
+    decision: accepted
+    evidence_subject: "feat: jsonl support"
+  - sha: c3ab9477afbd9b90875c61730c31b955cc538731
+    source_ref: git:c3ab9477afbd9b90875c61730c31b955cc538731
+    short_sha: c3ab947
+    changed_paths:
+      - .archledger.toml
+      - .archledger/profiles/arc42/sections/content-0001.md
+      - .archledger/profiles/arc42/sections/content-0002.md
+      - .archledger/profiles/arc42/sections/content-0003.md
+      - .archledger/profiles/arc42/sections/content-0004.md
+      - .archledger/profiles/arc42/sections/content-0005.md
+      - .archledger/profiles/arc42/sections/content-0006.md
+      - .archledger/profiles/arc42/sections/content-0007.md
+      - .archledger/profiles/arc42/sections/content-0008.md
+      - .archledger/profiles/arc42/sections/content-0009.md
+      - .archledger/profiles/arc42/sections/content-0010.md
+      - .archledger/profiles/arc42/sections/content-0011.md
+      - .archledger/profiles/arc42/sections/content-0012.md
+      - .archledger/storage.yaml
+      - ARCHITECTURE.md
+    stats:
+      files_changed: 0
+      insertions: 1190
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - ARCHITECTURE.md
+      - .archledger/
+    observed_behavior: "Added arc42 architecture documentation covering system context, building blocks, runtime, deployment, and quality requirements"
+    public_impact: docs
+    decision: accepted
+    evidence_subject: "doc: add architecture docu"
+  - sha: bfd7b25e910e9959392128a57ec469641dc5f158
+    source_ref: git:bfd7b25e910e9959392128a57ec469641dc5f158
+    short_sha: bfd7b25
+    changed_paths:
+      - .taskledger.toml
+      - CHANGELOG.md
+      - README.md
+      - docs/api.md
+      - docs/storage.md
+      - ledgercore/__init__.py
+      - ledgercore/frontmatter.py
+      - ledgercore/hashing.py
+      - ledgercore/jsonio.py
+      - ledgercore/jsonl.py
+      - ledgercore/path_text.py
+      - ledgercore/time.py
+      - pyproject.toml
+      - tests/test_frontmatter.py
+      - tests/test_hashing.py
+      - tests/test_jsonio.py
+      - tests/test_jsonl.py
+      - tests/test_path_text.py
+      - tests/test_time.py
+    stats:
+      files_changed: 0
+      insertions: 820
+      deletions: 80
+    inspected: true
+    inspected_paths:
+      - ledgercore/frontmatter.py
+      - ledgercore/jsonl.py
+      - ledgercore/time.py
+    observed_behavior: "Enhanced front matter rendering with FrontMatterRenderOptions for key ordering, scalar styling, and template placeholder modes; added interval_to_compact_duration and parse_compact_duration time utilities"
+    public_impact: public
+    decision: accepted
+    evidence_subject: "feat: improved feature set for version 0.2.0"
+  - sha: a0bc3b3f97f4c8584e9269a770d52932971a5e4d
+    source_ref: git:a0bc3b3f97f4c8584e9269a770d52932971a5e4d
+    short_sha: a0bc3b3
+    changed_paths:
+      - .archledger/profiles/arc42/sections/content-0001.md
+      - .archledger/profiles/arc42/sections/content-0002.md
+      - .archledger/profiles/arc42/sections/content-0003.md
+      - .archledger/profiles/arc42/sections/content-0004.md
+      - .archledger/profiles/arc42/sections/content-0005.md
+      - .archledger/profiles/arc42/sections/content-0006.md
+      - .archledger/profiles/arc42/sections/content-0007.md
+      - .archledger/profiles/arc42/sections/content-0008.md
+      - .archledger/profiles/arc42/sections/content-0009.md
+      - .archledger/profiles/arc42/sections/content-0010.md
+      - .archledger/profiles/arc42/sections/content-0011.md
+      - .archledger/profiles/arc42/sections/content-0012.md
+      - .archledger/storage.yaml
+      - ARCHITECTURE.md
+      - docs/api.md
+      - ledgercore/frontmatter.py
+      - ledgercore/path_text.py
+      - ledgercore/paths.py
+      - tests/test_frontmatter.py
+      - tests/test_hashing.py
+      - tests/test_jsonio.py
+      - tests/test_jsonl.py
+      - tests/test_path_text.py
+      - tests/test_paths.py
+      - tests/test_time.py
+    stats:
+      files_changed: 0
+      insertions: 358
+      deletions: 388
+    inspected: true
+    inspected_paths:
+      - .archledger/
+      - docs/api.md
+      - ledgercore/frontmatter.py
+    observed_behavior: "Pre-commit formatting fixes for architecture docs, API docs, and code style compliance"
+    public_impact: internal
+    decision: internal
+    evidence_subject: "chore: fix pre-commit"
+  - sha: 93e4bdd177e17e7cc8547f49f22fc4bcb8461457
+    source_ref: git:93e4bdd177e17e7cc8547f49f22fc4bcb8461457
+    short_sha: 93e4bdd
+    changed_paths:
+      - pyproject.toml
+    stats:
+      files_changed: 0
+      insertions: 5
+      deletions: 2
+    inspected: true
+    inspected_paths:
+      - pyproject.toml
+    observed_behavior: "Switched to hatch-vcs for dynamic version sourcing from git tags"
+    public_impact: internal
+    decision: internal
+    evidence_subject: "chore: dynamic versioning"
+  - sha: 110a11e9528c771888a4d65cf71e7f8f343eefa7
+    source_ref: git:110a11e9528c771888a4d65cf71e7f8f343eefa7
+    short_sha: 110a11e
+    changed_paths:
+      - .archledger/profiles/arc42/sections/content-0002.md
+      - .archledger/profiles/arc42/sections/content-0008.md
+      - .archledger/profiles/arc42/sections/content-0011.md
+      - .taskledger.toml
+      - ARCHITECTURE.md
+      - CHANGELOG.md
+      - docs/release.md
+      - docs/storage.md
+      - ledgercore/__init__.py
+      - ledgercore/atomic.py
+      - ledgercore/errors.py
+      - ledgercore/frontmatter.py
+      - ledgercore/ids.py
+      - ledgercore/jsonio.py
+      - ledgercore/yamlio.py
+      - pyproject.toml
+      - scripts/smoke_wheel.py
+      - tests/test_atomic.py
+      - tests/test_errors.py
+      - tests/test_frontmatter.py
+      - tests/test_ids.py
+      - tests/test_jsonio.py
+      - tests/test_version.py
+      - tests/test_yamlio.py
+    stats:
+      files_changed: 0
+      insertions: 460
+      deletions: 72
+    inspected: true
+    inspected_paths:
+      - ledgercore/errors.py
+      - ledgercore/frontmatter.py
+      - tests/test_version.py
+      - scripts/smoke_wheel.py
+    observed_behavior: "Added version test and wheel smoke test, added new error codes, expanded front matter render options, and refined documentation"
+    public_impact: public
+    decision: accepted
+    evidence_subject: "feat: polish for version 0.2.0"
+  - sha: 0be2ef0c90d73e3288d5712dbcf3c4c2c88376f8
+    source_ref: git:0be2ef0c90d73e3288d5712dbcf3c4c2c88376f8
+    short_sha: 0be2ef0
+    changed_paths:
+      - .archledger/profiles/arc42/sections/content-0002.md
+      - .archledger/profiles/arc42/sections/content-0008.md
+      - .archledger/profiles/arc42/sections/content-0011.md
+      - ARCHITECTURE.md
+      - docs/release.md
+      - ledgercore/frontmatter.py
+      - scripts/smoke_wheel.py
+      - tests/test_frontmatter.py
+      - tests/test_version.py
+    stats:
+      files_changed: 0
+      insertions: 26
+      deletions: 38
+    inspected: true
+    inspected_paths:
+      - tests/test_version.py
+      - tests/test_frontmatter.py
+      - scripts/smoke_wheel.py
+    observed_behavior: "Fixed pre-commit issues and test assertions for version and front matter tests"
+    public_impact: internal
+    decision: internal
+    evidence_subject: "chore: pre-commit and pytest fix"

@@ -1,0 +1,183 @@
+schema_version: 1
+object_type: commit_audit_sheet
+versioning:
+  schema_version: 1
+  revision: 2
+release_version: 0.1.0
+git_base_ref: 46f75ad
+git_base_sha: 46f75ade6a0dbb7a5fff37b79ee6a32c1c6fd65a
+git_head_ref: "3331767"
+git_head_sha: 3331767af5206ddc4d782f323d877c5602bd6f85
+git_range: 46f75ade6a0dbb7a5fff37b79ee6a32c1c6fd65a..3331767af5206ddc4d782f323d877c5602bd6f85
+commit_count: 4
+rows:
+  - sha: d7d8b755ed5350a318d7fa0c8a526fa90892fb49
+    source_ref: git:d7d8b755ed5350a318d7fa0c8a526fa90892fb49
+    short_sha: d7d8b75
+    changed_paths:
+      - .codecrate.toml
+      - .gitignore
+      - .pre-commit-config.yaml
+      - .readthedocs.yaml
+      - .ruff.toml
+      - .taskledger.toml
+      - README.md
+      - ledgercore/__init__.py
+      - ledgercore/atomic.py
+      - ledgercore/errors.py
+      - ledgercore/frontmatter.py
+      - ledgercore/ids.py
+      - ledgercore/io.py
+      - ledgercore/jsonio.py
+      - ledgercore/paths.py
+      - ledgercore/py.typed
+      - ledgercore/time.py
+      - pyproject.toml
+      - setup.py
+      - tests/__init__.py
+      - tests/test_atomic.py
+      - tests/test_frontmatter.py
+      - tests/test_ids.py
+      - tests/test_io.py
+      - tests/test_jsonio.py
+      - tests/test_paths.py
+      - tests/test_time.py
+    stats:
+      files_changed: 0
+      insertions: 1534
+      deletions: 39
+    inspected: true
+    inspected_paths:
+      - ledgercore/atomic.py
+      - ledgercore/frontmatter.py
+      - ledgercore/ids.py
+      - ledgercore/io.py
+      - ledgercore/jsonio.py
+      - ledgercore/paths.py
+      - ledgercore/errors.py
+    observed_behavior:
+      Initial library release providing atomic text writes with fsync,
+      YAML front matter read/write, prefixed numeric ID formatting/parsing, UTF-8 text
+      helpers, validated JSON loading, safe relative path validation, and time utilities
+    public_impact: public
+    decision: accepted
+    evidence_subject: "feat: initial release"
+    target_entry_id: entry-0001
+  - sha: 406e3ccbb6786ef39232f7dfa3286aaab346ae99
+    source_ref: git:406e3ccbb6786ef39232f7dfa3286aaab346ae99
+    short_sha: 406e3cc
+    changed_paths:
+      - .taskledger.toml
+      - README.md
+      - ledgercore/__init__.py
+      - ledgercore/atomic.py
+      - ledgercore/errors.py
+      - ledgercore/frontmatter.py
+      - ledgercore/ids.py
+      - ledgercore/jsonio.py
+      - ledgercore/paths.py
+      - ledgercore/time.py
+      - ledgercore/yamlio.py
+      - setup.py
+      - tests/test_atomic.py
+      - tests/test_errors.py
+      - tests/test_frontmatter.py
+      - tests/test_ids.py
+      - tests/test_jsonio.py
+      - tests/test_paths.py
+      - tests/test_time.py
+      - tests/test_yamlio.py
+    stats:
+      files_changed: 0
+      insertions: 1132
+      deletions: 53
+    inspected: true
+    inspected_paths:
+      - ledgercore/ids.py
+      - ledgercore/atomic.py
+      - ledgercore/yamlio.py
+      - ledgercore/jsonio.py
+      - ledgercore/paths.py
+    observed_behavior:
+      Added LedgerIdFormat with configurable segment support for compound
+      IDs, switched atomic_create_text to O_CREAT|O_EXCL for race-safe file creation,
+      added YAML store module with validated loading/dumping
+    public_impact: public
+    decision: accepted
+    evidence_subject: "feat: add ids and improve atomic writes and other basic feature"
+    target_entry_id: entry-0007
+  - sha: 8238a803ad72ab19f28298a0444a7b7398095bb7
+    source_ref: git:8238a803ad72ab19f28298a0444a7b7398095bb7
+    short_sha: 8238a80
+    changed_paths:
+      - .taskledger.toml
+      - README.md
+      - ledgercore/__init__.py
+      - ledgercore/refs.py
+      - tests/test_refs.py
+    stats:
+      files_changed: 0
+      insertions: 603
+      deletions: 1
+    inspected: true
+    inspected_paths:
+      - ledgercore/refs.py
+    observed_behavior:
+      Added cross-ledger resource reference system supporting canonical
+      (tl:task-0001), file-safe (tl-task-0001), and local (task-0001) ref formats with
+      parsing, formatting, and validation
+    public_impact: public
+    decision: accepted
+    evidence_subject: "feat: new global ref system"
+    target_entry_id: entry-0010
+  - sha: 3331767af5206ddc4d782f323d877c5602bd6f85
+    source_ref: git:3331767af5206ddc4d782f323d877c5602bd6f85
+    short_sha: "3331767"
+    changed_paths:
+      - .github/workflows/codecov.yml
+      - .github/workflows/pre-commit.yml
+      - .github/workflows/python-publish.yml
+      - .github/workflows/tests.yml
+      - .taskledger.toml
+      - CHANGELOG.md
+      - CONTRIBUTING.md
+      - README.md
+      - docs/Makefile
+      - docs/api.md
+      - docs/build.sh
+      - docs/index.md
+      - docs/references.md
+      - docs/release.md
+      - docs/requirements.txt
+      - docs/storage.md
+      - examples/frontmatter.py
+      - examples/refs.py
+      - examples/storage.py
+      - ledgercore/errors.py
+      - ledgercore/ids.py
+      - ledgercore/paths.py
+      - ledgercore/refs.py
+      - pyproject.toml
+      - tests/test_frontmatter.py
+      - tests/test_jsonio.py
+      - tests/test_paths.py
+      - tests/test_refs.py
+    stats:
+      files_changed: 0
+      insertions: 1251
+      deletions: 91
+    inspected: true
+    inspected_paths:
+      - docs/
+      - examples/
+      - .github/workflows/
+      - README.md
+      - CONTRIBUTING.md
+    observed_behavior:
+      Added API reference documentation, module guides for storage
+      and refs, usage examples for frontmatter/refs/storage, CI workflows for testing/coverage/publishing,
+      and contribution guidelines
+    public_impact: docs
+    decision: accepted
+    evidence_subject: "doc: docs and examples have been added"
+    target_entry_id: entry-0011
