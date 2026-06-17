@@ -46,6 +46,7 @@ dev = [
 docs = [
     "sphinx",
     "sphinx-rtd-theme",
+    "myst-parser>=2.0.0",
 ]
 release = [
     "build",

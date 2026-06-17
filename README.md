@@ -359,7 +359,7 @@ Versions are derived from VCS tags; there is no static version in
 
 1. Update `CHANGELOG.md` and create or sign the target tag, such as `v0.2.0`.
 2. Run the test, coverage, lint, formatting, typing, example, and docs gates in
-   [`docs/release.rst`](docs/release.rst).
+   [`docs/release.md`](docs/release.md).
 3. Run `python -m build` and `python -m twine check dist/*`.
 4. Verify the wheel and sdist contain `LICENSE` and generated `_version.py`.
 5. Smoke-test the built wheel in a clean virtualenv.

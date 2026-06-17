@@ -19,6 +19,7 @@ except metadata.PackageNotFoundError:
 version = ".".join(release.split(".")[:2])
 
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
@@ -26,6 +27,19 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
 ]
+
+source_suffix = {
+    ".md": "markdown",
+}
+
+master_doc = "index"
+
+myst_enable_extensions = [
+    "colon_fence",
+    "deflist",
+]
+
+myst_heading_anchors = 3
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]

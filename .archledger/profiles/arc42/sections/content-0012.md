@@ -12,7 +12,7 @@ body_format: markdown
 created_at: "2026-06-13T08:41:40.792531+00:00"
 updated_at: "2026-06-13T08:56:02.903407+00:00"
 source_refs:
-  - path: docs/index.rst
+  - path: docs/index.md
     reason: Project terminology and documentation map
 ---
 
