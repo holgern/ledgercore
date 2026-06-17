@@ -30,6 +30,21 @@
   {
     "audience": null,
     "breaking": false,
+    "entry_id": "entry-0001",
+    "internal": false,
+    "kind": "changed",
+    "order": 1,
+    "record_revision": 2,
+    "release_version": "0.2.1",
+    "scopes": [],
+    "source_refs": ["git:2aa45ae21bc532caa37f2bf7d2b60735d211c613"],
+    "sources": ["git:2aa45ae21bc532caa37f2bf7d2b60735d211c613"],
+    "status": "accepted",
+    "summary": "Changed core storage and validation behavior for atomic writes, front matter, IDs, and source-tree versions"
+  },
+  {
+    "audience": null,
+    "breaking": false,
     "entry_id": "entry-0002",
     "internal": false,
     "kind": "added",
@@ -54,6 +69,21 @@
     "source_refs": ["git:528de47eb8bd03612865717a12173ba5249ead7e"],
     "status": "accepted",
     "summary": "JSON Lines object storage with deterministic writing, comment support, and recoverable line-level error handling"
+  },
+  {
+    "audience": null,
+    "breaking": false,
+    "entry_id": "entry-0002",
+    "internal": false,
+    "kind": "added",
+    "order": 2,
+    "record_revision": 1,
+    "release_version": "0.2.1",
+    "scopes": [],
+    "source_refs": ["git:4b783978cef28c8ead085a55c294f881da844b17"],
+    "sources": ["git:4b783978cef28c8ead085a55c294f881da844b17"],
+    "status": "accepted",
+    "summary": "Added shared ledger configuration helpers for locating ledger.toml files and selecting project or tool tables"
   },
   {
     "audience": null,
@@ -86,6 +116,27 @@
   {
     "audience": null,
     "breaking": false,
+    "entry_id": "entry-0003",
+    "internal": false,
+    "kind": "docs",
+    "order": 3,
+    "record_revision": 2,
+    "release_version": "0.2.1",
+    "scopes": [],
+    "source_refs": [
+      "git:4d1ea650cf850f79c07d9462fd5fb8eb95b304ac",
+      "git:1e7b09611242f33dac441f8a3cae2764d5d19ecc"
+    ],
+    "sources": [
+      "git:4d1ea650cf850f79c07d9462fd5fb8eb95b304ac",
+      "git:1e7b09611242f33dac441f8a3cae2764d5d19ecc"
+    ],
+    "status": "accepted",
+    "summary": "Documented Sphinx builds with MyST Markdown and myst-parser dependencies"
+  },
+  {
+    "audience": null,
+    "breaking": false,
     "entry_id": "entry-0004",
     "internal": false,
     "kind": "added",
@@ -110,6 +161,21 @@
     "source_refs": ["git:528de47eb8bd03612865717a12173ba5249ead7e"],
     "status": "accepted",
     "summary": "Path text normalization for Unicode escapes, punctuation, and filesystem-safe slug generation"
+  },
+  {
+    "audience": null,
+    "breaking": false,
+    "entry_id": "entry-0004",
+    "internal": true,
+    "kind": "internal",
+    "order": 4,
+    "record_revision": 2,
+    "release_version": "0.2.1",
+    "scopes": [],
+    "source_refs": ["git:82d03534a96a6dfc718cdffa77555a4fcedf581f"],
+    "sources": ["git:82d03534a96a6dfc718cdffa77555a4fcedf581f"],
+    "status": "accepted",
+    "summary": "Changed version smoke test coverage"
   },
   {
     "audience": null,
@@ -142,6 +208,21 @@
   {
     "audience": null,
     "breaking": false,
+    "entry_id": "entry-0005",
+    "internal": true,
+    "kind": "internal",
+    "order": 5,
+    "record_revision": 2,
+    "release_version": "0.2.1",
+    "scopes": [],
+    "source_refs": ["git:a07c9bfc81c0b6bac562febe30778b20c1855941"],
+    "sources": ["git:a07c9bfc81c0b6bac562febe30778b20c1855941"],
+    "status": "accepted",
+    "summary": "Changed repository URLs and project metadata links"
+  },
+  {
+    "audience": null,
+    "breaking": false,
     "entry_id": "entry-0006",
     "internal": false,
     "kind": "added",
@@ -166,6 +247,21 @@
     "source_refs": ["git:bfd7b25e910e9959392128a57ec469641dc5f158"],
     "status": "accepted",
     "summary": "interval_to_compact_duration and parse_compact_duration for human-readable time interval formatting"
+  },
+  {
+    "audience": null,
+    "breaking": false,
+    "entry_id": "entry-0006",
+    "internal": true,
+    "kind": "internal",
+    "order": 6,
+    "record_revision": 2,
+    "release_version": "0.2.1",
+    "scopes": [],
+    "source_refs": ["git:c12e31af4fba89525c6aeb2d7c749579e5d04313"],
+    "sources": ["git:c12e31af4fba89525c6aeb2d7c749579e5d04313"],
+    "status": "accepted",
+    "summary": "Changed releaseledger state and historical changelog records"
   },
   {
     "audience": null,

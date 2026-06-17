@@ -1,0 +1,197 @@
+schema_version: 1
+object_type: commit_audit_sheet
+versioning:
+  schema_version: 1
+  revision: 3
+release_version: 0.2.1
+git_base_ref: v0.2.0
+git_base_sha: 0be2ef0c90d73e3288d5712dbcf3c4c2c88376f8
+git_head_ref: HEAD
+git_head_sha: 1e7b09611242f33dac441f8a3cae2764d5d19ecc
+git_range: 0be2ef0c90d73e3288d5712dbcf3c4c2c88376f8..1e7b09611242f33dac441f8a3cae2764d5d19ecc
+commit_count: 7
+rows:
+  - sha: 82d03534a96a6dfc718cdffa77555a4fcedf581f
+    source_ref: git:82d03534a96a6dfc718cdffa77555a4fcedf581f
+    short_sha: 82d0353
+    changed_paths: []
+    stats:
+      files_changed: 0
+      insertions: 0
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - tests/test_version.py
+    observed_behavior:
+      Test-only housekeeping in version smoke coverage; no public API,
+      CLI, documentation, or packaging behavior changed.
+    public_impact: unknown
+    decision: internal
+    target_entry_key: internal-test-housekeeping
+    target_entry_id: entry-0004
+  - sha: 4d1ea650cf850f79c07d9462fd5fb8eb95b304ac
+    source_ref: git:4d1ea650cf850f79c07d9462fd5fb8eb95b304ac
+    short_sha: 4d1ea65
+    changed_paths: []
+    stats:
+      files_changed: 0
+      insertions: 0
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - docs/api.md
+      - docs/api.rst
+      - docs/conf.py
+      - docs/index.md
+      - docs/index.rst
+      - docs/references.md
+      - docs/references.rst
+      - docs/release.md
+      - docs/release.rst
+      - docs/storage.md
+      - docs/storage.rst
+    observed_behavior:
+      Documentation sources were converted from Markdown to reStructuredText
+      as an intermediate format before the later MyST Markdown conversion; the net shipped
+      docs change is covered with the MyST documentation entry.
+    public_impact: unknown
+    decision: grouped
+    target_entry_key: docs-myst-markdown
+    target_entry_id: entry-0003
+  - sha: 2aa45ae21bc532caa37f2bf7d2b60735d211c613
+    source_ref: git:2aa45ae21bc532caa37f2bf7d2b60735d211c613
+    short_sha: 2aa45ae
+    changed_paths: []
+    stats:
+      files_changed: 0
+      insertions: 0
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - ledgercore/__init__.py
+      - ledgercore/atomic.py
+      - ledgercore/frontmatter.py
+      - ledgercore/ids.py
+      - README.md
+      - docs/release.rst
+      - docs/storage.rst
+      - tests/test_atomic.py
+      - tests/test_frontmatter.py
+      - tests/test_ids.py
+      - tests/test_version.py
+    observed_behavior:
+      Atomic text overwrite preserves existing file permissions, ID
+      format constructors and segment formatting reject invalid configuration, minimal
+      front matter scalar rendering rejects unsafe keys, atomic_create_text is exported,
+      and missing generated version metadata falls back to an unknown version for source
+      trees.
+    public_impact: unknown
+    decision: accepted
+    target_entry_key: harden-core-storage-and-id-validation
+    target_entry_id: entry-0001
+  - sha: 4b783978cef28c8ead085a55c294f881da844b17
+    source_ref: git:4b783978cef28c8ead085a55c294f881da844b17
+    short_sha: 4b78397
+    changed_paths: []
+    stats:
+      files_changed: 0
+      insertions: 0
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - ledgercore/config.py
+      - ledgercore/errors.py
+      - ledgercore/__init__.py
+      - README.md
+      - docs/api.rst
+      - docs/storage.rst
+      - tests/test_config.py
+      - tests/test_errors.py
+    observed_behavior:
+      Added shared ledger workspace configuration helpers for canonical
+      config filenames, config discovery, project table selection, tool table selection,
+      and LedgerConfigError validation failures.
+    public_impact: unknown
+    decision: accepted
+    target_entry_key: shared-ledger-config-helpers
+    target_entry_id: entry-0002
+  - sha: a07c9bfc81c0b6bac562febe30778b20c1855941
+    source_ref: git:a07c9bfc81c0b6bac562febe30778b20c1855941
+    short_sha: a07c9bf
+    changed_paths: []
+    stats:
+      files_changed: 0
+      insertions: 0
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - CONTRIBUTING.md
+      - docs/index.rst
+      - pyproject.toml
+    observed_behavior:
+      Repository URLs and project links were corrected; no library
+      API or runtime behavior changed.
+    public_impact: unknown
+    decision: internal
+    target_entry_key: internal-url-housekeeping
+    target_entry_id: entry-0005
+  - sha: c12e31af4fba89525c6aeb2d7c749579e5d04313
+    source_ref: git:c12e31af4fba89525c6aeb2d7c749579e5d04313
+    short_sha: c12e31a
+    changed_paths: []
+    stats:
+      files_changed: 0
+      insertions: 0
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - .releaseledger.toml
+      - .releaseledger/ledgers/main/events/events.jsonl
+      - .releaseledger/ledgers/main/indexes/entries.json
+      - .releaseledger/ledgers/main/indexes/releases.json
+      - .releaseledger/ledgers/main/releases/0.1.0/audit/commit-audit.yaml
+      - .releaseledger/ledgers/main/releases/0.1.0/entries/entry-0001.md
+      - .releaseledger/ledgers/main/releases/0.2.0/audit/commit-audit.yaml
+      - .releaseledger/ledgers/main/releases/0.2.0/entries/entry-0001.md
+      - CHANGELOG.md
+    observed_behavior:
+      Releaseledger state was initialized for existing releases and
+      CHANGELOG.md was rebuilt from releaseledger source data; this is release tooling
+      provenance only.
+    public_impact: unknown
+    decision: internal
+    target_entry_key: internal-releaseledger-state
+    target_entry_id: entry-0006
+  - sha: 1e7b09611242f33dac441f8a3cae2764d5d19ecc
+    source_ref: git:1e7b09611242f33dac441f8a3cae2764d5d19ecc
+    short_sha: 1e7b096
+    changed_paths: []
+    stats:
+      files_changed: 0
+      insertions: 0
+      deletions: 0
+    inspected: true
+    inspected_paths:
+      - docs/api.md
+      - docs/api.rst
+      - docs/conf.py
+      - docs/index.md
+      - docs/index.rst
+      - docs/references.md
+      - docs/references.rst
+      - docs/release.md
+      - docs/release.rst
+      - docs/requirements.txt
+      - docs/storage.md
+      - docs/storage.rst
+      - pyproject.toml
+      - README.md
+      - CHANGELOG.md
+    observed_behavior:
+      Sphinx documentation sources were migrated to MyST Markdown,
+      myst-parser was enabled in docs configuration and docs requirements, and the docs
+      extra now includes myst-parser.
+    public_impact: unknown
+    decision: grouped
+    target_entry_key: docs-myst-markdown
+    target_entry_id: entry-0003
