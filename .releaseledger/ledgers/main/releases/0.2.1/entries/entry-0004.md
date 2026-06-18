@@ -12,13 +12,13 @@ status: accepted
 audience: null
 scopes: []
 source_refs:
-- git:82d03534a96a6dfc718cdffa77555a4fcedf581f
+  - git:82d03534a96a6dfc718cdffa77555a4fcedf581f
 paths:
-- tests/test_version.py
+  - tests/test_version.py
 issues: []
 prs: []
 sources:
-- git:82d03534a96a6dfc718cdffa77555a4fcedf581f
+  - git:82d03534a96a6dfc718cdffa77555a4fcedf581f
 breaking: false
 internal: true
 order: 4

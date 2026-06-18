@@ -12,22 +12,22 @@ status: accepted
 audience: null
 scopes: []
 source_refs:
-- git:4d1ea650cf850f79c07d9462fd5fb8eb95b304ac
-- git:1e7b09611242f33dac441f8a3cae2764d5d19ecc
+  - git:4d1ea650cf850f79c07d9462fd5fb8eb95b304ac
+  - git:1e7b09611242f33dac441f8a3cae2764d5d19ecc
 paths:
-- docs/api.md
-- docs/conf.py
-- docs/index.md
-- docs/references.md
-- docs/release.md
-- docs/requirements.txt
-- docs/storage.md
-- pyproject.toml
+  - docs/api.md
+  - docs/conf.py
+  - docs/index.md
+  - docs/references.md
+  - docs/release.md
+  - docs/requirements.txt
+  - docs/storage.md
+  - pyproject.toml
 issues: []
 prs: []
 sources:
-- git:4d1ea650cf850f79c07d9462fd5fb8eb95b304ac
-- git:1e7b09611242f33dac441f8a3cae2764d5d19ecc
+  - git:4d1ea650cf850f79c07d9462fd5fb8eb95b304ac
+  - git:1e7b09611242f33dac441f8a3cae2764d5d19ecc
 breaking: false
 internal: false
 order: 3

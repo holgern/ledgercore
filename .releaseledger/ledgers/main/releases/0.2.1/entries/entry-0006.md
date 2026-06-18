@@ -12,16 +12,16 @@ status: accepted
 audience: null
 scopes: []
 source_refs:
-- git:c12e31af4fba89525c6aeb2d7c749579e5d04313
+  - git:c12e31af4fba89525c6aeb2d7c749579e5d04313
 paths:
-- .releaseledger.toml
-- .releaseledger/ledgers/main/indexes/entries.json
-- .releaseledger/ledgers/main/indexes/releases.json
-- CHANGELOG.md
+  - .releaseledger.toml
+  - .releaseledger/ledgers/main/indexes/entries.json
+  - .releaseledger/ledgers/main/indexes/releases.json
+  - CHANGELOG.md
 issues: []
 prs: []
 sources:
-- git:c12e31af4fba89525c6aeb2d7c749579e5d04313
+  - git:c12e31af4fba89525c6aeb2d7c749579e5d04313
 breaking: false
 internal: true
 order: 6

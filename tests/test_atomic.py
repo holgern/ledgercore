@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -34,6 +35,10 @@ class TestAtomicWriteText:
         atomic_write_text(p, "new")
         assert p.read_text(encoding="utf-8") == "new"
 
+    @pytest.mark.skipif(
+        sys.platform == "win32",
+        reason="Unix permission bits are not supported on Windows",
+    )
     def test_preserves_existing_mode(self, tmp_path: Path) -> None:
         p = tmp_path / "f.txt"
         p.write_text("old", encoding="utf-8")
@@ -41,6 +46,10 @@ class TestAtomicWriteText:
         atomic_write_text(p, "new", fsync=False)
         assert p.stat().st_mode & 0o777 == 0o640
 
+    @pytest.mark.skipif(
+        sys.platform == "win32",
+        reason="Unix permission bits are not supported on Windows",
+    )
     def test_new_file_uses_private_mode(self, tmp_path: Path) -> None:
         p = tmp_path / "f.txt"
         atomic_write_text(p, "new", fsync=False)

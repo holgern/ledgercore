@@ -12,15 +12,15 @@ status: accepted
 audience: null
 scopes: []
 source_refs:
-- git:a07c9bfc81c0b6bac562febe30778b20c1855941
+  - git:a07c9bfc81c0b6bac562febe30778b20c1855941
 paths:
-- CONTRIBUTING.md
-- docs/index.rst
-- pyproject.toml
+  - CONTRIBUTING.md
+  - docs/index.rst
+  - pyproject.toml
 issues: []
 prs: []
 sources:
-- git:a07c9bfc81c0b6bac562febe30778b20c1855941
+  - git:a07c9bfc81c0b6bac562febe30778b20c1855941
 breaking: false
 internal: true
 order: 5
